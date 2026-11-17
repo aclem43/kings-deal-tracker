@@ -1,0 +1,59 @@
+name: Update prices and deploy
+
+on:
+  schedule:
+    - cron: "23 19 * * *"   # daily, ~5:23am AEST
+  workflow_dispatch:        # "Run workflow" button in the Actions tab
+  push:
+    branches: [main]
+    paths: ["web/**", "scraper/build.py"]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Scrape catalogue
+        if: github.event_name != 'push'
+        run: python scraper/scrape.py
+
+      - name: Commit new price data
+        if: github.event_name != 'push'
+        run: |
+          git config user.name "price-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "Price data $(TZ=Australia/Brisbane date +%F)"
+            git push
+          fi
+
+      - name: Build site
+        run: python scraper/build.py
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deploy
+        uses: actions/deploy-pages@v4
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
