@@ -132,6 +132,8 @@ export function imageUrl(p: Item): string {
   return p.i ? `${p.i}?width=320&height=240&fit=bounds&quality=75` : "";
 }
 
+export const thumbUrl = (src: string) => (src ? `${src}?width=96&height=96&fit=bounds&quality=70` : "");
+
 export async function loadData() {
   const res = await fetch("data.json", { cache: "no-cache" });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);

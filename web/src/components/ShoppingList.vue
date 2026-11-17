@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { Gift, ImageOff, Minus, Plus, Search, ShoppingCart, Trash2, TriangleAlert, X } from "@lucide/vue";
+import { Gift, ImageOff, Minus, Plus, ShoppingCart, Trash2, TriangleAlert, X } from "@lucide/vue";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { money, pct, shortName, type Bundle, type Product } from "@/lib/data";
+import { money, pct, shortName, thumbUrl, type Bundle, type Product } from "@/lib/data";
+import { rankMatches } from "@/lib/search";
+import SearchAutocomplete, { type SuggestionGroup } from "./SearchAutocomplete.vue";
 import { optimise } from "@/lib/optimise";
 import { MAX_QTY, useShoppingList } from "@/composables/useShoppingList";
 
 const props = defineProps<{ products: Product[]; bundles: Bundle[]; bySku: Map<string, Product> }>();
 
 const list = useShoppingList();
-const thumb = (src: string) => (src ? `${src}?width=96&height=96&fit=bounds&quality=70` : "");
+const thumb = thumbUrl;
 const name = (sku: string) => shortName(props.bySku.get(sku)?.n ?? sku);
 
 // Items on the list that still exist in today's data, in the order they were added.
@@ -37,20 +38,25 @@ const saving = computed(() => {
 /* ---------- adding items ---------- */
 
 const q = ref("");
-const results = computed(() => {
-  const words = q.value.toLowerCase().split(/\s+/).filter(Boolean);
-  if (!words.length) return [];
-  return props.products.filter((p) => words.every((w) => p.hay.includes(w))).slice(0, 8);
-});
-function addFirst() {
-  if (results.value[0]) { list.add(results.value[0].s); q.value = ""; }
-}
+const groups = computed<SuggestionGroup[]>(() => [{
+  label: "Products",
+  items: rankMatches(props.products, q.value, 8).map((p) => ({
+    id: p.s,
+    label: shortName(p.n),
+    detail: list.has(p.s) ? `On your list (${list.items.value[p.s]}) · add one more` : p.s,
+    image: thumb(p.i),
+    aside: money(p.p),
+    muted: !p.st && !p.sst,
+  })),
+}]);
+function add(sku: string) { list.add(sku); q.value = ""; }
+function addFirst() { const s = groups.value[0].items[0]; if (s) add(s.id); }
 </script>
 
 <template>
   <div class="grid items-start gap-4 pb-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
     <!-- the list -->
-    <Card class="gap-0 py-0">
+    <Card class="gap-0 overflow-visible py-0">
       <div class="flex items-center justify-between gap-2 border-b p-4">
         <h2 class="font-heading text-base font-semibold">Your list</h2>
         <Button v-if="rows.length" variant="ghost" size="sm" class="text-muted-foreground" @click="list.clear()">
@@ -58,39 +64,16 @@ function addFirst() {
         </Button>
       </div>
 
-      <div class="relative border-b p-4">
-        <Search class="pointer-events-none absolute top-1/2 left-6.5 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
+      <div class="border-b p-4">
+        <SearchAutocomplete
           v-model="q"
-          type="search"
+          :groups="groups"
           placeholder="Add a product…"
-          autocomplete="off"
-          aria-label="Add a product"
-          class="h-9 pl-8"
-          @keydown.enter.prevent="addFirst"
-          @keydown.esc="q = ''"
+          label="Add a product"
+          empty-text="No products match."
+          @select="add($event.id)"
+          @submit="addFirst"
         />
-        <ul
-          v-if="q && results.length"
-          class="absolute inset-x-4 top-full z-30 -mt-2 overflow-hidden rounded-lg border bg-popover shadow-lg"
-        >
-          <li v-for="p in results" :key="p.s">
-            <button
-              type="button"
-              class="flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-muted"
-              @click="list.add(p.s); q = ''"
-            >
-              <img v-if="p.i" :src="thumb(p.i)" alt="" class="size-8 shrink-0 rounded bg-white object-contain" />
-              <span class="min-w-0 flex-1 truncate">{{ shortName(p.n) }}</span>
-              <span class="text-muted-foreground tabular-nums">{{ money(p.p) }}</span>
-              <Plus v-if="!list.has(p.s)" class="size-4 text-muted-foreground" />
-              <span v-else class="text-xs text-muted-foreground">+1</span>
-            </button>
-          </li>
-        </ul>
-        <p v-else-if="q" class="absolute inset-x-4 top-full z-30 -mt-2 rounded-lg border bg-popover px-3 py-2 text-sm text-muted-foreground shadow-lg">
-          No products match.
-        </p>
       </div>
 
       <ul v-if="rows.length" class="divide-y">

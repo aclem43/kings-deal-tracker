@@ -11,7 +11,7 @@ const showParts = computed(() => p.value.ps && Math.abs(p.value.sv) > 0.005);
 <template>
   <ItemCard :item="p" :badges="bundleBadges(p)" :was="p.recentDrop ? p.pv : null">
     <template #how>
-      <p v-if="showParts" class="-mt-1 text-xs text-muted-foreground">Parts separately {{ money(p.ps) }}</p>
+      <p v-if="showParts" class="-mt-1.5 text-xs text-muted-foreground">Parts separately {{ money(p.ps) }}</p>
     </template>
     <p class="text-xs text-muted-foreground">{{ p.x.join(" + ") }}</p>
   </ItemCard>

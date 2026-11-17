@@ -28,11 +28,11 @@ const cartLabel = computed(() => (inList.value ? "Remove from shopping list" : "
 </script>
 
 <template>
-  <Card class="relative gap-0 py-0 transition-shadow hover:shadow-md">
+  <Card class="relative gap-0 overflow-hidden py-0 transition-shadow hover:shadow-md">
     <Button
       variant="outline"
       size="icon"
-      class="absolute top-2 right-2 z-10 rounded-full bg-card/90 backdrop-blur"
+      class="absolute top-2.5 right-2.5 z-10 size-8 rounded-full bg-card/90 backdrop-blur"
       :class="on ? 'border-transparent bg-warn-bg! text-warn' : 'text-muted-foreground'"
       :aria-pressed="on"
       :aria-label="label"
@@ -45,7 +45,7 @@ const cartLabel = computed(() => (inList.value ? "Remove from shopping list" : "
       v-if="listable"
       variant="outline"
       size="icon"
-      class="absolute top-12 right-2 z-10 rounded-full bg-card/90 backdrop-blur"
+      class="absolute top-12 right-2.5 z-10 size-8 rounded-full bg-card/90 backdrop-blur"
       :class="inList ? 'border-transparent bg-good-bg! text-good' : 'text-muted-foreground'"
       :aria-pressed="inList"
       :aria-label="cartLabel"
@@ -56,13 +56,14 @@ const cartLabel = computed(() => (inList.value ? "Remove from shopping list" : "
       <ShoppingCart v-else />
     </Button>
 
-    <a :href="item.u" target="_blank" rel="noopener" tabindex="-1" class="flex aspect-video items-center sm:aspect-4/3 justify-center bg-white p-2">
-      <img v-if="item.i" :src="imageUrl(item)" alt="" loading="lazy" class="max-h-full max-w-full object-contain" />
-      <ImageOff v-else class="size-8 text-stone-300" />
+    <!-- A fixed-height box so every card in a row starts its text at the same line. -->
+    <a :href="item.u" target="_blank" rel="noopener" tabindex="-1" class="relative block h-44 shrink-0 bg-white sm:h-48">
+      <img v-if="item.i" :src="imageUrl(item)" alt="" loading="lazy" class="absolute inset-0 size-full object-contain p-3" />
+      <ImageOff v-else class="absolute inset-0 m-auto size-8 text-stone-300" />
     </a>
 
-    <div class="flex flex-1 flex-col gap-2 border-t p-3">
-      <a :href="item.u" target="_blank" rel="noopener" class="line-clamp-3 text-[0.9rem] leading-snug hover:underline">
+    <div class="flex flex-1 flex-col gap-2.5 border-t p-4">
+      <a :href="item.u" target="_blank" rel="noopener" class="line-clamp-2 min-h-[2lh] text-[0.9rem] leading-snug hover:underline" :title="item.n">
         <span class="font-medium">{{ title }}</span><span v-if="rest" class="text-muted-foreground"> · {{ rest }}</span>
       </a>
 
@@ -79,7 +80,7 @@ const cartLabel = computed(() => (inList.value ? "Remove from shopping list" : "
 
       <slot />
 
-      <div class="mt-auto flex flex-col gap-1.5 pt-1">
+      <div class="mt-auto flex flex-col gap-1.5 border-t pt-3">
         <Sparkline :item="item" />
         <p class="text-xs text-muted-foreground">{{ statsLine(item) }}</p>
       </div>

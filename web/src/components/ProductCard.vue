@@ -14,19 +14,19 @@ const allLink = computed(() => `#view=bundles&has=${encodeURIComponent(p.value.s
 <template>
   <ItemCard :item="p" :badges="productBadges(p)" :was="p.recentDrop ? p.pv : null" listable>
     <template #how>
-      <p v-if="p.via" class="-mt-1 text-xs text-muted-foreground">
+      <p v-if="p.via" class="-mt-1.5 text-xs text-muted-foreground">
         Cheapest in a bundle · alone {{ money(p.sp) }}<template v-if="!p.sst"> (out of stock)</template>
       </p>
-      <p v-else-if="p.nb" class="-mt-1 text-xs text-muted-foreground">Cheapest on its own</p>
+      <p v-else-if="p.nb" class="-mt-1.5 text-xs text-muted-foreground">Cheapest on its own</p>
     </template>
 
-    <Collapsible v-if="p.b.length" v-model:open="open" class="border-t pt-2 text-xs">
-      <CollapsibleTrigger class="group flex w-full items-center gap-1 text-muted-foreground hover:text-foreground">
+    <Collapsible v-if="p.b.length" v-model:open="open" class="-mx-1 text-xs">
+      <CollapsibleTrigger class="group flex w-full items-center gap-1 rounded-md px-1 py-0.5 text-muted-foreground hover:text-foreground">
         <ChevronRight class="size-3.5 transition-transform group-data-[state=open]:rotate-90" />
         In {{ p.nb }} bundle{{ p.nb === 1 ? "" : "s" }}
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <ul class="mt-2 flex flex-col gap-1">
+        <ul class="mt-1.5 flex flex-col gap-0.5">
           <li v-for="o in p.b" :key="o.s" :class="!o.st && 'opacity-55'">
             <a
               :href="o.u"
@@ -47,7 +47,7 @@ const allLink = computed(() => `#view=bundles&has=${encodeURIComponent(p.value.s
         <a
           v-if="p.nb > p.b.length"
           :href="allLink"
-          class="mt-2 inline-flex items-center gap-1 text-muted-foreground hover:text-foreground hover:underline"
+          class="mt-1.5 ml-1 inline-flex items-center gap-1 text-muted-foreground hover:text-foreground hover:underline"
         >
           All {{ p.nb }} bundles with this <ArrowRight class="size-3" />
         </a>
