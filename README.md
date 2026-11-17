@@ -30,6 +30,13 @@ bought alone. So the site is organised around real products:
 A "usual price" is only shown once a product has 14 days of history. Until then,
 "best deal" ranks by bundle savings and recent drops.
 
+### Shopping list
+
+Add products (with quantities) to a shopping list, kept in the browser, and the site
+works out the cheapest mix of in-stock bundles and single items that covers the whole
+list. Bundle extras count as free. It solves this exactly (`web/src/lib/optimise.ts`)
+and only falls back to a greedy plan for very large lists, which the page says.
+
 ## Setup
 
 1. Create a public GitHub repo and push this folder to `main`.

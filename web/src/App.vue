@@ -8,15 +8,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 import FilterBar from "@/components/FilterBar.vue";
 import ProductCard from "@/components/ProductCard.vue";
 import BundleCard from "@/components/BundleCard.vue";
+import ShoppingList from "@/components/ShoppingList.vue";
 import { daysAgo, isProduct, shortName, type Bundle, type Item, type Payload, type Product, type View, loadData } from "@/lib/data";
 import { useFilters, type SortKey } from "@/composables/useFilters";
 import { useWatchList } from "@/composables/useWatchList";
+import { useShoppingList } from "@/composables/useShoppingList";
 
 const PAGE = 60;
 const REPO = "https://github.com/aclem43/kings-deal-tracker";
 
 const { state, readHash, writeHash, setView } = useFilters();
 const watchList = useWatchList();
+const shopping = useShoppingList();
+const listCount = computed(() => Object.keys(shopping.items.value).filter((s) => bySku.value.has(s)).length);
 
 const meta = shallowRef<Payload | null>(null);
 const products = shallowRef<Product[]>([]);
@@ -187,14 +191,26 @@ onMounted(async () => {
           <TabsList>
             <TabsTrigger value="products" class="px-4">Products</TabsTrigger>
             <TabsTrigger value="bundles" class="px-4">Bundles</TabsTrigger>
+            <TabsTrigger value="list" class="gap-1.5 px-4">
+              Shopping list
+              <span v-if="listCount" class="rounded-full bg-foreground px-1.5 text-[0.7rem] leading-4 text-background tabular-nums">{{ listCount }}</span>
+            </TabsTrigger>
           </TabsList>
         </Tabs>
         <p class="text-sm text-muted-foreground">
           <template v-if="state.view === 'products'">Each product's price is the cheapest way to get it today: on its own, or inside a bundle that includes it.</template>
-          <template v-else>Every bundle listing, compared with buying its parts separately.</template>
+          <template v-else-if="state.view === 'bundles'">Every bundle listing, compared with buying its parts separately.</template>
+          <template v-else>Add what you want and get the cheapest mix of bundles and single items that covers all of it.</template>
         </p>
       </div>
 
+      <div v-if="state.view === 'list'" class="pt-4">
+        <p v-if="error" class="text-sm text-destructive">{{ error }}</p>
+        <Skeleton v-else-if="loading" class="h-64 w-full rounded-xl" />
+        <ShoppingList v-else :products="products" :bundles="bundles" :by-sku="bySku" />
+      </div>
+
+      <template v-else>
       <section aria-label="Filters" class="z-20 -mx-4 bg-page/90 px-4 py-4 backdrop-blur md:sticky md:top-0">
         <FilterBar :depts="depts" :subs="subs" :watch-count="watchCount" />
       </section>
@@ -231,6 +247,7 @@ onMounted(async () => {
       <div ref="sentinel" class="flex justify-center py-8">
         <Button v-if="hasMore" variant="outline" @click="more">Show more</Button>
       </div>
+      </template>
     </main>
 
     <footer class="mx-auto max-w-7xl border-t px-4 py-8 text-sm text-muted-foreground">

@@ -12,7 +12,7 @@ const allLink = computed(() => `#view=bundles&has=${encodeURIComponent(p.value.s
 </script>
 
 <template>
-  <ItemCard :item="p" :badges="productBadges(p)" :was="p.recentDrop ? p.pv : null">
+  <ItemCard :item="p" :badges="productBadges(p)" :was="p.recentDrop ? p.pv : null" listable>
     <template #how>
       <p v-if="p.via" class="-mt-1 text-xs text-muted-foreground">
         Cheapest in a bundle · alone {{ money(p.sp) }}<template v-if="!p.sst"> (out of stock)</template>

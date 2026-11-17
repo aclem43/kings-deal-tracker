@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { Star, ImageOff } from "@lucide/vue";
+import { Star, ImageOff, ShoppingCart, Check } from "@lucide/vue";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Sparkline from "./Sparkline.vue";
 import ToneBadge from "./ToneBadge.vue";
 import { imageUrl, money, statsLine, type BadgeInfo, type Item } from "@/lib/data";
 import { useWatchList } from "@/composables/useWatchList";
+import { useShoppingList } from "@/composables/useShoppingList";
 
 // The frame shared by product and bundle cards: image, watch star, name, price, badges,
 // sparkline and stats. The default slot holds what differs between the two.
-const props = defineProps<{ item: Item; badges: BadgeInfo[]; was?: number | null }>();
+const props = defineProps<{ item: Item; badges: BadgeInfo[]; was?: number | null; listable?: boolean }>();
 
 // "Kings Fridge | 12V | Steel" -> bold "Kings Fridge", then the rest muted.
 const parts = computed(() => props.item.n.split("|").map((s) => s.trim()).filter(Boolean));
@@ -20,6 +21,10 @@ const rest = computed(() => parts.value.slice(1).join(" · "));
 const watch = useWatchList();
 const on = computed(() => watch.has(props.item.s));
 const label = computed(() => (on.value ? "Remove from watch list" : "Add to watch list"));
+
+const cart = useShoppingList();
+const inList = computed(() => cart.has(props.item.s));
+const cartLabel = computed(() => (inList.value ? "Remove from shopping list" : "Add to shopping list"));
 </script>
 
 <template>
@@ -35,6 +40,20 @@ const label = computed(() => (on.value ? "Remove from watch list" : "Add to watc
       @click="watch.toggle(item.s)"
     >
       <Star :class="on && 'fill-current'" />
+    </Button>
+    <Button
+      v-if="listable"
+      variant="outline"
+      size="icon"
+      class="absolute top-12 right-2 z-10 rounded-full bg-card/90 backdrop-blur"
+      :class="inList ? 'border-transparent bg-good-bg! text-good' : 'text-muted-foreground'"
+      :aria-pressed="inList"
+      :aria-label="cartLabel"
+      :title="cartLabel"
+      @click="cart.toggle(item.s)"
+    >
+      <Check v-if="inList" />
+      <ShoppingCart v-else />
     </Button>
 
     <a :href="item.u" target="_blank" rel="noopener" tabindex="-1" class="flex aspect-video items-center sm:aspect-4/3 justify-center bg-white p-2">

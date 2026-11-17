@@ -1,6 +1,6 @@
 // Shapes of _site/data.json as written by scraper/build.py (short keys keep the file small).
 
-export type View = "products" | "bundles";
+export type View = "products" | "bundles" | "list";
 
 interface BaseRaw {
   s: string;        // sku
@@ -41,6 +41,7 @@ export interface ProductRaw extends BaseRaw {
 export interface BundleRaw extends BaseRaw {
   ps: number;  // parts bought separately
   k: string[]; // part skus
+  kq?: number[]; // how many of each part (older data.json files don't have it)
   x: string[]; // part names
 }
 

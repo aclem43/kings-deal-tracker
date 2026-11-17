@@ -44,7 +44,8 @@ const state = reactive<FilterState>({ ...DEFAULTS });
 
 function readHash() {
   const h = new URLSearchParams(location.hash.slice(1));
-  state.view = h.get("view") === "bundles" ? "bundles" : "products";
+  const v = h.get("view");
+  state.view = v === "bundles" || v === "list" ? v : "products";
   state.has = h.get("has") || "";
   for (const k of TEXT) (state[k] as string) = h.get(k) ?? DEFAULTS[k];
   if (!SORTS.some((s) => s.value === state.sort)) state.sort = "deal";

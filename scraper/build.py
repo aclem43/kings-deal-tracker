@@ -194,6 +194,7 @@ def build(meta, hist, today):
             "ps": round(parts_sum, 2),
             "sv": round((parts_sum - price) / parts_sum, 4) if parts_sum else 0,
             "k": [s for s, _ in m["parts"]],
+            "kq": [q for _, q in m["parts"]],  # how many of each part, in step with "k"
             "x": [f"{short(meta[s]['name'])}{f' ×{q}' if q > 1 else ''}" for s, q in m["parts"] if s in meta],
         })
         rec.update(price_stats(hist.points[sku], today))
