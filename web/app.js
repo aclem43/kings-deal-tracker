@@ -16,8 +16,11 @@ let view = "products";
 let has = "";        // bundles view: only bundles containing this SKU
 let filtered = [];
 let shown = 0;
+const known = new Set();   // every SKU in the data, products and bundles
+const WATCH_KEY = "kings-watch";
+let watched = loadWatch();
 
-const FIELDS = ["q", "dept", "sub", "sort", "instock", "viabundle", "antideal", "atl", "dropped"];
+const FIELDS = ["q", "dept", "sub", "sort", "instock", "viabundle", "antideal", "atl", "dropped", "watchonly"];
 const DEFAULTS = { sort: "deal", instock: true };
 
 function esc(s) {
@@ -31,6 +34,70 @@ function enrich(p) {
   p.atLow = p.hi > p.lo && p.p <= p.lo;
   p.hay = (p.n + " " + p.s + " " + p.c.join(" ")).toLowerCase();
   return p;
+}
+
+/* ---------- watch list (kept in this browser only) ---------- */
+
+function loadWatch() {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(WATCH_KEY) || "[]"));
+  } catch (e) {
+    return new Set();
+  }
+}
+
+function saveWatch() {
+  try {
+    localStorage.setItem(WATCH_KEY, JSON.stringify([...watched]));
+  } catch (e) {
+    // Storage unavailable: the list still works until the page is closed.
+  }
+}
+
+function watchCount() {
+  return [...watched].filter((s) => known.has(s)).length;
+}
+
+function paintWatch(btn) {
+  const on = watched.has(btn.dataset.sku);
+  btn.classList.toggle("on", on);
+  btn.setAttribute("aria-pressed", String(on));
+  btn.textContent = on ? "★" : "☆";
+  btn.title = on ? "Remove from watch list" : "Add to watch list";
+  btn.setAttribute("aria-label", btn.title);
+}
+
+function syncWatchUI() {
+  const n = watchCount();
+  $("watchcount").textContent = n ? `(${n})` : "";
+}
+
+function toggleWatch(sku) {
+  if (watched.has(sku)) watched.delete(sku);
+  else watched.add(sku);
+  saveWatch();
+  document.querySelectorAll(".watch").forEach((b) => { if (b.dataset.sku === sku) paintWatch(b); });
+  syncWatchUI();
+  if ($("watchonly").checked && !watched.has(sku)) dropCard(sku);
+}
+
+// Remove an un-starred card in place, keeping the pages already loaded and the scroll position.
+function dropCard(sku) {
+  const before = filtered.length;
+  filtered = filtered.filter((p) => p.s !== sku);
+  if (filtered.length === before) return;
+  const card = $("grid").querySelector(`.watch[data-sku="${CSS.escape(sku)}"]`)?.closest(".card");
+  if (card) { card.remove(); shown--; }
+  showCount();
+  $("more").hidden = shown >= filtered.length;
+}
+
+// Another tab changed the watch list: pick up its version so we don't overwrite it.
+function reloadWatch() {
+  watched = loadWatch();
+  document.querySelectorAll(".watch").forEach(paintWatch);
+  syncWatchUI();
+  if ($("watchonly").checked) apply();
 }
 
 /* ---------- URL state ---------- */
@@ -108,10 +175,11 @@ const sorters = {
 function apply() {
   const words = $("q").value.toLowerCase().split(/\s+/).filter(Boolean);
   const dept = $("dept").value, sub = $("sub").value;
-  const f = Object.fromEntries(["instock", "viabundle", "antideal", "atl", "dropped"].map((id) => [id, $(id).checked]));
+  const f = Object.fromEntries(["instock", "viabundle", "antideal", "atl", "dropped", "watchonly"].map((id) => [id, $(id).checked]));
   const list = data[view];
 
   filtered = list.filter((p) =>
+    (!f.watchonly || watched.has(p.s)) &&
     (!f.instock || p.st) &&
     (!f.atl || p.atLow) &&
     (!f.dropped || p.recentDrop) &&
@@ -123,12 +191,16 @@ function apply() {
     words.every((w) => p.hay.includes(w))
   );
   filtered.sort(sorters[$("sort").value] || sorters.deal);
-  const noun = view === "products" ? "products" : "bundles";
-  $("count").textContent = `${filtered.length.toLocaleString()} of ${list.length.toLocaleString()} ${noun}`;
+  showCount();
   $("grid").replaceChildren();
   shown = 0;
   renderMore();
   writeHash();
+}
+
+function showCount() {
+  const noun = view === "products" ? "products" : "bundles";
+  $("count").textContent = `${filtered.length.toLocaleString()} of ${data[view].length.toLocaleString()} ${noun}`;
 }
 
 /* ---------- rendering ---------- */
@@ -170,7 +242,12 @@ function stats(p) {
 
 function shell(p, inner) {
   const img = p.i ? `<img src="${esc(p.i)}?width=320&height=240&fit=bounds&quality=75" alt="" loading="lazy">` : "";
+  const on = watched.has(p.s);
+  const title = on ? "Remove from watch list" : "Add to watch list";
+  const watchBtn = `<button type="button" class="watch${on ? " on" : ""}" data-sku="${esc(p.s)}" aria-pressed="${on}" ` +
+    `title="${title}" aria-label="${title}">${on ? "★" : "☆"}</button>`;
   return `<li class="card">
+    ${watchBtn}
     <a class="img" href="${esc(p.u)}" target="_blank" rel="noopener" tabindex="-1">${img}</a>
     <div class="body">
       <a class="name" href="${esc(p.u)}" target="_blank" rel="noopener">${esc(p.n)}</a>
@@ -267,6 +344,7 @@ async function init() {
   data.products = payload.products.map(enrich);
   data.bundles = payload.bundles.map(enrich);
   data.products.forEach((p) => bySku.set(p.s, p));
+  [...data.products, ...data.bundles].forEach((p) => known.add(p.s));
 
   const days = daysAgo(payload.trackedSince) + 1;
   const updated = new Date(payload.generated).toLocaleString("en-AU", { dateStyle: "medium", timeStyle: "short" });
@@ -281,8 +359,13 @@ async function init() {
   let t;
   $("q").addEventListener("input", () => { clearTimeout(t); t = setTimeout(apply, 150); });
   $("dept").addEventListener("change", () => { refreshDepts($("dept").value, ""); apply(); });
-  for (const id of ["sub", "sort", "instock", "viabundle", "antideal", "atl", "dropped"]) $(id).addEventListener("change", apply);
+  for (const id of ["sub", "sort", "instock", "viabundle", "antideal", "atl", "dropped", "watchonly"]) $(id).addEventListener("change", apply);
   $("more").addEventListener("click", renderMore);
+  $("grid").addEventListener("click", (e) => {
+    const b = e.target.closest(".watch");
+    if (b) toggleWatch(b.dataset.sku);
+  });
+  window.addEventListener("storage", (e) => { if (e.key === WATCH_KEY || e.key === null) reloadWatch(); });
   for (const b of document.querySelectorAll(".tabs button")) {
     b.addEventListener("click", () => {
       if (view === b.dataset.view) return;
@@ -294,6 +377,7 @@ async function init() {
     });
   }
   window.addEventListener("hashchange", () => { loadFromHash(); window.scrollTo(0, 0); });
+  syncWatchUI();
   loadFromHash();
 }
 
