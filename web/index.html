@@ -5,58 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kings Deal Tracker</title>
 <meta name="description" content="Daily price history for 4WD Supacentre / Adventure Kings products, including the cheapest bundle that contains each one.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%23c8102e%27/%3E%3Cpath d=%27M7 21l6-6 4 4 8-8%27 stroke=%27white%27 stroke-width=%273%27 fill=%27none%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
 <link rel="alternate" type="application/rss+xml" title="Price drops" href="feed.xml">
-<link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="top">
-  <div class="wrap">
-    <h1>Kings Deal Tracker</h1>
-    <p class="sub">The cheapest way to buy each 4WD Supacentre product, alone or in a bundle, with daily price history. Unofficial, not affiliated.</p>
-    <p class="status" id="status">Loading…</p>
-  </div>
-</header>
-
-<main class="wrap">
-  <nav class="tabs" aria-label="View">
-    <button type="button" data-view="products" aria-pressed="true">Products</button>
-    <button type="button" data-view="bundles" aria-pressed="false">Bundles</button>
-  </nav>
-  <p class="explain" data-for="products">Each product's price is the cheapest way to get it today: on its own, or inside a bundle that includes it.</p>
-  <p class="explain" data-for="bundles" hidden>Every bundle listing, compared with buying its parts separately.</p>
-
-  <section class="controls" aria-label="Filters">
-    <input id="q" type="search" placeholder="Search products or SKU…" autocomplete="off">
-    <select id="dept" aria-label="Department"><option value="">All departments</option></select>
-    <select id="sub" aria-label="Category"><option value="">All categories</option></select>
-    <select id="sort" aria-label="Sort">
-      <option value="deal">Best deal</option>
-      <option value="save">Biggest bundle saving</option>
-      <option value="drop">Biggest recent drop</option>
-      <option value="price-asc">Price: low to high</option>
-      <option value="price-desc">Price: high to low</option>
-      <option value="new">Newest listings</option>
-      <option value="name">Name</option>
-    </select>
-    <label class="chk"><input id="instock" type="checkbox" checked> In stock</label>
-    <label class="chk" data-for="products"><input id="viabundle" type="checkbox"> Cheaper in a bundle</label>
-    <label class="chk" data-for="bundles" hidden><input id="antideal" type="checkbox"> Dearer than its parts</label>
-    <label class="chk"><input id="atl" type="checkbox"> At all-time low</label>
-    <label class="chk"><input id="dropped" type="checkbox"> Recently dropped</label>
-    <label class="chk" title="Items you starred, saved in this browser"><input id="watchonly" type="checkbox"> Watch list <span id="watchcount"></span></label>
-  </section>
-  <p class="chip" id="haschip" hidden></p>
-
-  <p class="count" id="count"></p>
-  <ul class="grid" id="grid"></ul>
-  <div class="more"><button id="more" type="button" hidden>Show more</button></div>
-</main>
-
-<footer class="wrap foot">
-  <p>Prices are collected once a day from the public catalogue. Always check the price on
-  <a href="https://www.4wdsupacentre.com.au/">4wdsupacentre.com.au</a> before buying.
-  <a href="feed.xml">RSS feed of price drops</a>.</p>
-</footer>
-<script src="app.js"></script>
+<div id="app"></div>
+<script type="module" src="/src/main.ts"></script>
 </body>
 </html>

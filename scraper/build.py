@@ -7,7 +7,8 @@ any bundle that contains it. History, lows and the "usual price" all use that
 effective price, because that is what you would actually pay.
 
 Outputs:
-  _site/index.html, app.js, style.css   (copied from web/)
+  _site/index.html, assets/              (the built frontend, copied from web/dist/;
+                                         run `npm run build` in web/ first)
   _site/data.json                        (products + bundles)
   _site/feed.xml                         (RSS of recent effective-price drops)
 """
@@ -24,7 +25,7 @@ from xml.sax.saxutils import escape
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
-WEB = ROOT / "web"
+WEB = ROOT / "web" / "dist"
 OUT = ROOT / "_site"
 
 TYPICAL_WINDOW_DAYS = 90
@@ -250,6 +251,8 @@ def main():
     drops = price_drops(products, today)
     tracked_since = min((pts[0][0] for pts in hist.points.values()), default=today)
 
+    if not (WEB / "index.html").exists():
+        raise SystemExit(f"{WEB} is missing: run `npm ci && npm run build` in web/ first")
     if OUT.exists():
         shutil.rmtree(OUT)
     shutil.copytree(WEB, OUT)
