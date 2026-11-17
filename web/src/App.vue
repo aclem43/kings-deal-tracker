@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, shallowRef, useTemplateRef, watch } from "vue";
 import { useColorMode, useEventListener, useIntersectionObserver } from "@vueuse/core";
-import { ArrowDownUp, Boxes, Clock, History, Moon, PackageSearch, Rss, Sun, SunMoon, Tag, X } from "@lucide/vue";
+import { ArrowDownUp, Boxes, Clock, History, Moon, PackageSearch, Rss, Sun, SunMoon, X } from "@lucide/vue";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import AppLogo from "@/components/AppLogo.vue";
 import FilterBar from "@/components/FilterBar.vue";
 import ProductCard from "@/components/ProductCard.vue";
 import BundleCard from "@/components/BundleCard.vue";
@@ -169,7 +170,7 @@ onMounted(async () => {
       <div class="h-1 bg-brand" />
       <div class="mx-auto grid max-w-7xl grid-cols-[1fr_auto] items-center gap-x-6 gap-y-3 px-4 py-3 sm:px-6 md:grid-cols-[auto_1fr_auto]">
         <a href="#" class="flex items-center gap-2.5 font-heading text-lg font-bold tracking-tight" title="Kings Deal Tracker home">
-          <span class="flex size-8 items-center justify-center rounded-lg bg-brand text-white"><Tag class="size-4" /></span>
+          <AppLogo class="size-8 shrink-0" />
           Kings Deal Tracker
         </a>
 
