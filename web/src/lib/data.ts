@@ -71,7 +71,11 @@ export const today = new Date(new Date().toISOString().slice(0, 10));
 
 export const money = (v: number) =>
   "$" + v.toLocaleString("en-AU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-export const pct = (v: number) => Math.round(v * 100) + "%";
+// A real but tiny saving reads "<1%", never "0%".
+export const pct = (v: number) => {
+  const r = Math.round(Math.abs(v) * 100);
+  return (r === 0 && v !== 0 ? "<1" : String(r)) + "%";
+};
 export const daysAgo = (iso: string) => Math.round((today.getTime() - new Date(iso).getTime()) / DAY);
 export const shortName = (n: string) => n.split("|")[0].trim();
 

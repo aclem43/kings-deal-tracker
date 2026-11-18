@@ -289,6 +289,10 @@ A centred container (max 90rem) with 16px gutters on phones and 24px from 640px.
 
 Above the results sits a count line ("536 of 536 products") and the sort control with its ranking note, closed by a 2px carton-ink rule (80% opacity). Below 1024px the rail is replaced by a sticky carton-coloured bar: search plus a Filters button that opens a bottom sheet for department and category, then a sideways-scrolling chip row whose right edge fades out over 2.5rem to say there is more.
 
+On phones (below 640px) a label lies on its side so a quick check shows several products a screen: a 6.5rem photo column (photo on top, watch and list toggles under it) beside the name and routing block, with the "how" line, badges and bundle line below; the sparkline is left out there and the low/high line stays. A shared single-item link keeps the upright label and hides search and filters entirely.
+
+Scrolling loads results on its own for the first three pages (180); after that "Show more (n left)" asks, so the footer and its disclaimer stay reachable.
+
 Inside a label the rhythm is 12px side insets, 8–12px vertical steps, a fixed 10rem photo well so text in a row starts on the same line, and two-line clamped names. Touch targets grow on coarse pointers: chips, icon toggles and inputs go from 36–40px to 44px.
 
 ## Elevation & Depth
@@ -320,10 +324,10 @@ The base of every product, bundle, list panel, plan panel, error and empty state
 - **Icon toggles:** 36px (44px coarse) square buttons with a 2px border at the photo's top right: watch (pressed fills hi-vis, star filled) and add-to-list (pressed fills saving green with a check).
 
 ### Routing Block (signature)
-Today's price, reversed: an ink block with label-coloured condensed price, flush left under a 2px rule. Beside it, right-aligned, what it is compared against: a Label Caps caption ("Alone", "Parts", "Was") over the struck-through comparison price. The plan total uses the same block at 2.5rem. At night it flips to a light block with dark figures.
+Today's price, reversed: an ink block with label-coloured condensed price, flush left under a 2px rule. Beside it, right-aligned, what it is compared against: a Label Caps caption ("Alone", "Parts alone", "Was") over the comparison price. Only "Was" (a previous price of the same listing) is struck through; "Alone" and "Parts alone" buy something different, so they print as plain semibold figures. When the price comes from a bundle, the "how" line under it says so ("Bundle price, includes 1 other item"). The plan total uses the same block at 2.5rem. At night it flips to a light block with dark figures.
 
 ### Manifest (signature)
-The winning bundle counted out like a consignment note. A 2px-ruled box: "Consignment" in small Label Caps over the bundle SKU in condensed bold, then one row per part with "PCS n/N" (or a range "PCS 2–3/4") right-aligned in condensed bold. The product being viewed is the marked line: pale saving-green fill and semibold. When the manifest links to the store, it takes the label-tint fill on hover.
+The winning bundle counted out like a consignment note. A 2px-ruled box: "Consignment" in small Label Caps over the bundle SKU in condensed bold, then one row per part with "PCS n/N" (or a range "PCS 2–3/4") right-aligned in condensed bold. The product being viewed is the marked line: pale saving-green fill and semibold. When the manifest links to the store, it takes the label-tint fill on hover. On phones the product label replaces the manifest with one semibold line of what comes with it ("+ Kings Clear Top Canvas Bag"), and bundle labels drop the Consignment/SKU header; the full manifest stays on a shared single-item view.
 
 ### Tone Badges
 Solid, square, condensed caps (0.8125rem, 0.06em). Three tones only: good (saving green on label-coloured text), warn (hi-vis on hi-vis ink), bad (signal red). A badge that carries a caveat shows a help cursor and a title, and repeats the caveat to screen readers.
@@ -332,8 +336,9 @@ Solid, square, condensed caps (0.8125rem, 0.06em). Three tones only: good (savin
 - **Style:** full-width 2px-ruled ink-on-label rows, 36px (44px coarse), name left in semibold, result count right in medium weight.
 - **Hover:** label-tint fill.
 - **Pressed:** reversed (ink fill, label text). The watch-list chip presses to hi-vis instead.
-- **Disabled:** when a filter would give nothing, the chip shows 0, dims to 60% stock with muted text, turns its border dashed, uses a not-allowed cursor, and prints the reason under it on the carton in the rail ("Needs price changes; history is still building", "Star items to add them"); on the phone chip row the reason is the title.
-- **Phone:** the same chips in a single horizontal row with the edge fade.
+- **Disabled:** when a filter would give nothing, the chip shows 0, dims to 60% stock with muted text, turns its border dashed, uses a not-allowed cursor, sorts to the end, and prints the reason under it on the carton in the rail. On the phone row a caption under the chips says what dashed means, and the reason is in the chip's accessible name.
+- **History building:** until usual prices exist, history filters that can match nothing are not drawn; one note says when they start ("All-time low and recent drop filters start on day 14"). The watch-list chip appears only once something is starred.
+- **Phone:** the same chips in a single horizontal row with the edge fade; a chosen department or category shows as a reversed removable chip above the row.
 
 ### Inputs / Fields
 - **Style:** 40px (44px coarse), 2px ink border, label fill, square, search icon inset left and clear button inset right.
@@ -346,8 +351,9 @@ Solid, square, condensed caps (0.8125rem, 0.06em). Three tones only: good (savin
 - **Shape:** square (0), 40px.
 - **Primary:** ink fill, label text ("Try again", "Clear all filters", "Use the shared list").
 - **Outline:** 2px ink border on label fill, label-tint on hover ("Show more", "Undo", "Clear list").
+- **Sharing:** "Copy link to this list" sits under the plan, as well as in the list header.
 - **Ghost:** no border, label-tint hover; on a hi-vis notice the hover is 10% hi-vis ink.
-- **Destructive actions** (clear list) are separated from the list and come with an Undo, never a confirm-and-forget.
+- **Destructive actions** (clear list, removing a row with × or with the bin that replaces "−" at one) come with an Undo on a hi-vis strip, and an undone row returns to its old place.
 
 ### Navigation (Black Bar)
 Bar black, the mark and condensed extra-bold wordmark at left. Tabs are condensed caps in bar-muted, bar-ink on hover; the current tab is a reversed block (bar-ink fill, bar text). The List tab carries a hi-vis count pip. RSS, source and theme toggle are 40px bar-muted icon buttons at the right. On phones the tabs drop to a full-width row under the wordmark. The footer reuses the bar: muted text, bar-ink underlined links, the unofficial disclaimer capped at 54ch.
@@ -356,7 +362,7 @@ Bar black, the mark and condensed extra-bold wordmark at left. Tabs are condense
 A full-width yellow strip directly under the bar, condensed caps 0.875rem: "Unofficial price tracker", when prices were pulled, days tracked and when usual prices start, and the current view's headline stat. Entries are spaced 24px apart and shorten on phones ("Day 2 of 14"). It holds status and caveats only; it is never a promotion.
 
 ### Sparkline
-A 36px step line in ink at 1.5px with an 8% ink area fill, ending in a small square dot at today's price, ringed in label stock. Drawn only once the price has actually moved; a flat history shows no chart.
+A 36px step line in ink at 1.5px over a 1px hairline baseline, no area fill, ending in a small square dot at today's price, ringed in label stock. Left out of the phone label, where the low/high line carries it. Drawn only once the price has actually moved and the history spans at least 7 days; until then the low/high line stands alone.
 
 ## Do's and Don'ts
 

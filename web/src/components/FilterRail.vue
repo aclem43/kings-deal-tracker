@@ -10,6 +10,7 @@ const props = defineProps<{
   counts: Record<Flag, number>;
   watchCount: number;
   building: boolean;
+  minDays: number;
   depts: { name: string; n: number }[];
   subs: string[];
 }>();
@@ -27,7 +28,7 @@ const total = computed(() => props.depts.reduce((n, d) => Math.max(n, d.n), 0));
   <nav aria-label="Filters" class="flex flex-col gap-5">
     <section>
       <h2 class="mb-1.5 label-caps text-page-muted">Show</h2>
-      <FilterChips :counts="counts" :watch-count="watchCount" :building="building" vertical />
+      <FilterChips :counts="counts" :watch-count="watchCount" :building="building" :min-days="minDays" vertical />
     </section>
 
     <section>

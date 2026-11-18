@@ -5,15 +5,20 @@ import { DAY, money, today, type Item } from "@/lib/data";
 const props = defineProps<{ item: Item }>();
 
 const W = 200, H = 36, PAD = 4;
+// Under a week of history every change crowds into the right-hand edge, so the chart waits;
+// the low/high line under it says the same thing in words until then.
+const MIN_SPAN_DAYS = 7;
 
 // A step line: prices hold until the next change, then the line runs on to today.
 // Drawn only once the price has actually moved; a flat line carries no information.
+// No area fill: with a short history a single drop would shade the whole strip into a block.
 const chart = computed(() => {
   const h = props.item.h;
   if (h.length < 2 || props.item.hi === props.item.lo) return null;
   const pts = h.map(([d, v]) => [new Date(d).getTime(), v] as const);
   const end = Math.max(today.getTime(), pts[pts.length - 1][0]);
-  const start = Math.min(pts[0][0], end - DAY);
+  if (end - pts[0][0] < MIN_SPAN_DAYS * DAY) return null;
+  const start = pts[0][0];
   const lo = props.item.lo, hi = props.item.hi;
   const x = (t: number) => ((t - start) / (end - start)) * W;
   const y = (v: number) => PAD + (1 - (v - lo) / (hi - lo)) * (H - 2 * PAD);
@@ -22,7 +27,6 @@ const chart = computed(() => {
   d += `H${W}`;
   return {
     d,
-    area: `${d}V${H}H${x(pts[0][0]).toFixed(1)}Z`,
     cy: y(props.item.p),
     label: "Price history: " + h.map(([dd, v]) => `${dd} ${money(v)}`).join(", "),
   };
@@ -38,7 +42,7 @@ const chart = computed(() => {
       role="img"
       :aria-label="chart.label"
     >
-      <path :d="chart.area" class="fill-foreground/8" />
+      <line x1="0" :y1="H - 0.5" :x2="W" :y2="H - 0.5" class="stroke-rule" vector-effect="non-scaling-stroke" />
       <path :d="chart.d" class="fill-none stroke-foreground" stroke-width="1.5" vector-effect="non-scaling-stroke" />
     </svg>
     <span

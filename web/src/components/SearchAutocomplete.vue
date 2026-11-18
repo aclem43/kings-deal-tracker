@@ -115,7 +115,7 @@ defineExpose({ focus: () => input.value?.focus() });
     <button
       v-if="q"
       type="button"
-      class="absolute top-1/2 right-1 flex size-8 -translate-y-1/2 items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground"
+      class="absolute top-1/2 right-1 flex size-8 -translate-y-1/2 pointer-coarse:right-0 pointer-coarse:size-11 items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground"
       aria-label="Clear search"
       @click="clear"
     >
@@ -144,7 +144,7 @@ defineExpose({ focus: () => input.value?.focus() });
             @mousemove="active = offsets[gi] + i"
             @click="choose(s)"
           >
-            <img v-if="s.image" :src="s.image" alt="" class="size-9 shrink-0 border border-rule bg-white object-contain" />
+            <img v-if="s.image" :src="s.image" alt="" class="size-9 shrink-0 border border-rule bg-well object-contain dark:mix-blend-multiply" />
             <span v-else-if="s.icon" class="flex size-7 shrink-0 items-center justify-center bg-muted">
               <component :is="s.icon" class="size-4" />
             </span>

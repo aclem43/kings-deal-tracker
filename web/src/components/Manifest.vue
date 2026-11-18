@@ -3,8 +3,9 @@ import { computed } from "vue";
 
 // A consignment manifest: the listing's SKU, then its contents counted out piece by piece.
 // Lines with more than one piece show a range (PCS 2–3/4) so big packs stay short.
+// `compact` drops the SKU header on phones, where the label is short on height.
 export interface ManifestLine { name: string; qty: number; mark?: boolean }
-const props = defineProps<{ sku: string; lines: ManifestLine[]; href?: string }>();
+const props = defineProps<{ sku: string; lines: ManifestLine[]; href?: string; compact?: boolean }>();
 
 const rows = computed(() => {
   const total = props.lines.reduce((n, l) => n + l.qty, 0);
@@ -19,8 +20,8 @@ const rows = computed(() => {
 
 <template>
   <component :is="href ? 'a' : 'div'" :href="href" :target="href ? '_blank' : undefined" :rel="href ? 'noopener' : undefined" class="block border-2 border-border" :class="href && 'hover:bg-muted'" :title="href ? `Open ${sku} on the store` : undefined">
-    <p class="border-b border-rule px-2 pt-1 pb-0.5 leading-tight">
-      <span class="block label-caps text-[0.6875rem] text-muted-foreground">Consignment</span>
+    <p class="border-b border-rule px-2 pt-1 pb-0.5 leading-tight" :class="compact && 'max-sm:hidden'">
+      <span class="block label-caps text-xs text-muted-foreground">Consignment</span>
       <span class="block font-heading text-[0.8125rem] font-bold tracking-[0.04em] break-all">{{ sku }}</span>
     </p>
     <ul class="text-[0.8125rem] leading-snug">

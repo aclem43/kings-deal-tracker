@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { SlidersHorizontal } from "@lucide/vue";
+import { SlidersHorizontal, X } from "@lucide/vue";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -18,6 +18,7 @@ const props = defineProps<{
   counts: Record<Flag, number>;
   watchCount: number;
   building: boolean;
+  minDays: number;
 }>();
 
 const { state, setDept } = useFilters();
@@ -64,8 +65,17 @@ const active = computed(() => (state.dept ? 1 : 0) + (state.sub ? 1 : 0));
       </Sheet>
     </div>
 
-    <div class="-mx-4 overflow-x-auto px-4 [mask-image:linear-gradient(to_right,#000_calc(100%-2.5rem),transparent)] pr-10 [scrollbar-width:none]">
-      <FilterChips :counts="counts" :watch-count="watchCount" :building="building" />
+    <div v-if="state.dept || state.sub" class="flex flex-wrap gap-1.5">
+      <button v-if="state.dept" type="button" class="picked" :aria-label="`Remove department: ${state.dept}`" @click="setDept('')">{{ state.dept }} <X class="size-3.5" /></button>
+      <button v-if="state.sub" type="button" class="picked" :aria-label="`Remove category: ${state.sub}`" @click="state.sub = ''">{{ state.sub }} <X class="size-3.5" /></button>
     </div>
+    <FilterChips :counts="counts" :watch-count="watchCount" :building="building" :min-days="minDays" />
   </div>
 </template>
+
+<style scoped>
+@reference "../style.css";
+.picked {
+  @apply inline-flex min-h-9 items-center gap-1 border-2 border-border bg-primary px-2.5 text-sm font-semibold text-primary-foreground pointer-coarse:min-h-11;
+}
+</style>

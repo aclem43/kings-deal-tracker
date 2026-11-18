@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
-import { useDebounceFn } from "@vueuse/core";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { Folder, Layers } from "@lucide/vue";
 import SearchAutocomplete, { type Suggestion, type SuggestionGroup } from "./SearchAutocomplete.vue";
 import { useFilters } from "@/composables/useFilters";
@@ -9,15 +8,24 @@ import { matchLabels, rankMatches } from "@/lib/search";
 
 // The catalogue search. `pool` is the current view's items after every filter except the
 // search text, so the suggestions only offer things the grid would actually show.
-const props = defineProps<{ depts: string[]; subs: string[]; pool: Item[]; inputClass?: string }>();
+// `focus` is true while the page shows one shared listing (#q=SKU); the box then stays
+// empty rather than showing a raw SKU, and the page heading names the item instead.
+const props = defineProps<{ depts: string[]; subs: string[]; pool: Item[]; inputClass?: string; focus?: boolean }>();
 
 const { state, setDept } = useFilters();
 
 // Debounce typing; keep the box in step when the hash changes underneath it.
-const q = ref(state.q);
-const pushQ = useDebounceFn((v: string) => { state.q = v; }, 150);
-watch(q, (v) => pushQ(v));
-watch(() => state.q, (v) => { if (v !== q.value) q.value = v; });
+const shownQ = () => (props.focus ? "" : state.q);
+const q = ref(shownQ());
+let timer: number | undefined;
+watch(q, (v) => {
+  clearTimeout(timer);
+  if (v === shownQ()) return;
+  timer = window.setTimeout(() => { state.q = v; }, 150);
+});
+watch([() => state.q, () => props.focus], () => { if (shownQ() !== q.value) q.value = shownQ(); });
+onBeforeUnmount(() => clearTimeout(timer));
+function submit() { clearTimeout(timer); state.q = q.value; }
 
 const noun = computed(() => (state.view === "bundles" ? "bundles" : "products"));
 
@@ -46,10 +54,11 @@ const groups = computed<SuggestionGroup[]>(() => {
 
 function onSelect(s: Suggestion) {
   const [kind, value] = [s.id.slice(0, s.id.indexOf(":")), s.id.slice(s.id.indexOf(":") + 1)];
+  clearTimeout(timer);
   if (kind === "dept") { setDept(value); q.value = state.q = ""; }
   else if (kind === "sub") { state.sub = value; q.value = state.q = ""; }
   // An item narrows the grid to that one listing, the same way the RSS feed links work.
-  else { q.value = state.q = value; }
+  else { state.q = value; q.value = shownQ(); }
 }
 </script>
 
@@ -63,6 +72,6 @@ function onSelect(s: Suggestion) {
     :input-class="inputClass"
     data-search
     @select="onSelect"
-    @submit="state.q = q"
+    @submit="submit"
   />
 </template>

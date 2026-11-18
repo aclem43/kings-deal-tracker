@@ -19,6 +19,9 @@ import { useWatchList } from "@/composables/useWatchList";
 import { useShoppingList } from "@/composables/useShoppingList";
 
 const PAGE = 60;
+// Scrolling loads more on its own up to this many; after that "Show more" asks, so the
+// footer (the unofficial disclaimer, feed and source) can still be reached.
+const AUTO_LIMIT = PAGE * 3;
 const REPO = "https://github.com/aclem43/kings-deal-tracker";
 
 const { state, readHash, writeHash, resetFilters } = useFilters();
@@ -152,7 +155,7 @@ const more = () => { shown.value += PAGE; };
 watch(state, () => { shown.value = PAGE; writeHash(); }, { deep: true });
 
 const sentinel = useTemplateRef<HTMLElement>("sentinel");
-useIntersectionObserver(sentinel, ([e]) => { if (e?.isIntersecting && hasMore.value) more(); }, { rootMargin: "800px" });
+useIntersectionObserver(sentinel, ([e]) => { if (e?.isIntersecting && hasMore.value && shown.value < AUTO_LIMIT) more(); }, { rootMargin: "800px" });
 
 /* ---------- header bits ---------- */
 
@@ -246,10 +249,23 @@ async function load() {
   }
 }
 onMounted(load);
+
+// "Skip to results" moves focus without touching the hash (the hash holds the filters).
+function skipToResults() {
+  const el = document.getElementById("results");
+  if (!el) return;
+  el.focus({ preventScroll: true });
+  el.scrollIntoView({ block: "start" });
+}
 </script>
 
 <template>
   <div class="flex min-h-dvh flex-col">
+    <a
+      href="#results"
+      class="sr-only z-50 bg-hivis px-4 py-2 font-heading font-bold tracking-[0.06em] text-hivis-ink uppercase focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
+      @click.prevent="skipToResults"
+    >Skip to results</a>
     <header class="bg-bar text-bar-ink">
       <div class="mx-auto grid max-w-[90rem] grid-cols-[1fr_auto] items-center gap-x-6 gap-y-2 px-4 py-2.5 sm:px-6 lg:grid-cols-[auto_auto_1fr_auto]">
         <a href="#" class="flex items-center gap-2.5 font-heading text-lg font-extrabold tracking-[0.04em] whitespace-nowrap uppercase sm:text-xl" title="Kings Deal Tracker home">
@@ -276,6 +292,7 @@ onMounted(load);
             :depts="deptCounts.map((d) => d.name)"
             :subs="subs"
             :pool="pool"
+            :focus="!!focusItem"
             class="w-full max-w-md"
             input-class="border-bar-muted/40 bg-bar-ink/10 text-bar-ink placeholder:text-bar-muted focus-visible:outline-hivis"
           />
@@ -326,14 +343,14 @@ onMounted(load);
           <p class="mt-1.5 max-w-2xl text-[0.9375rem] text-pretty text-page-muted">{{ intro.text }}</p>
         </section>
         <Skeleton v-if="loading" class="mb-10 h-64 w-full rounded-none" />
-        <ShoppingList v-else :products="products" :bundles="bundles" :by-sku="bySku" :as-of="status?.updated ?? ''" />
+        <ShoppingList id="results" tabindex="-1" class="outline-none" v-else :products="products" :bundles="bundles" :by-sku="bySku" :as-of="status?.updated ?? ''" />
       </template>
 
-      <div v-else class="grid gap-x-7 pt-5 lg:grid-cols-[15rem_minmax(0,1fr)]">
-        <aside class="max-lg:hidden">
+      <div v-else class="grid gap-x-7 pt-5" :class="!focusItem && 'lg:grid-cols-[15rem_minmax(0,1fr)]'">
+        <aside v-if="!focusItem" class="max-lg:hidden">
           <div class="sticky top-4 pb-8">
             <Skeleton v-if="loading" class="h-96 w-full rounded-none" />
-            <FilterRail v-else :counts="flagCounts" :watch-count="watchCount" :building="!!status?.building" :depts="deptCounts" :subs="subs" />
+            <FilterRail v-else :counts="flagCounts" :watch-count="watchCount" :building="!!status?.building" :min-days="status?.minDays ?? 14" :depts="deptCounts" :subs="subs" />
           </div>
         </aside>
 
@@ -351,24 +368,24 @@ onMounted(load);
             <p class="mt-1.5 max-w-2xl text-[0.9375rem] text-pretty text-page-muted max-sm:hidden">{{ intro.text }}</p>
           </section>
 
-          <section aria-label="Search and filters" class="sticky top-0 z-30 -mx-4 bg-page px-4 py-2.5 sm:-mx-6 sm:px-6 lg:hidden">
-            <FilterBar :depts="deptCounts" :subs="subs" :pool="pool" :counts="flagCounts" :watch-count="watchCount" :building="!!status?.building" />
+          <section v-if="!focusItem" aria-label="Search and filters" class="sticky top-0 z-30 -mx-4 bg-page px-4 py-2.5 sm:-mx-6 sm:px-6 lg:hidden">
+            <FilterBar :depts="deptCounts" :subs="subs" :pool="pool" :counts="flagCounts" :watch-count="watchCount" :building="!!status?.building" :min-days="status?.minDays ?? 14" />
           </section>
 
           <div v-if="!focusItem" class="flex items-start justify-between gap-x-4 border-b-2 border-page-ink/80 pt-1 pb-2">
             <div class="flex min-h-9 min-w-0 flex-wrap items-center gap-2">
-              <p v-if="!loading" class="text-sm whitespace-nowrap text-page-muted">
+              <p v-if="!loading" class="text-sm whitespace-nowrap text-page-muted" aria-live="polite" aria-atomic="true">
                 <strong class="font-bold text-page-ink">{{ filtered.length.toLocaleString() }}</strong>
                 of {{ list.length.toLocaleString() }} {{ state.view }}
               </p>
               <span v-if="hasBase" class="inline-flex max-w-full items-center gap-1 border-2 border-border bg-card py-0.5 pr-0.5 pl-2.5 text-sm text-card-foreground">
                 <span class="truncate">containing <strong class="font-semibold">{{ shortName(hasBase.n) }}</strong></span>
-                <button type="button" class="flex size-7 items-center justify-center hover:bg-muted" aria-label="Show all bundles" title="Show all bundles" @click="state.has = ''"><X class="size-4" /></button>
+                <button type="button" class="flex size-7 items-center justify-center hover:bg-muted pointer-coarse:size-11" aria-label="Show all bundles" title="Show all bundles" @click="state.has = ''"><X class="size-4" /></button>
               </span>
             </div>
-            <div class="flex flex-col items-end">
+            <div class="flex shrink-0 flex-col items-end">
               <Select v-model="state.sort">
-                <SelectTrigger class="h-9! gap-1.5 rounded-none border-0 bg-transparent! px-1 text-page-ink shadow-none hover:bg-page-ink/10!" aria-label="Sort">
+                <SelectTrigger class="h-9! gap-1.5 pointer-coarse:h-11! rounded-none border-0 bg-transparent! px-1 text-page-ink shadow-none hover:bg-page-ink/10!" aria-label="Sort">
                   <ArrowDownUp class="size-4" />
                   <span class="text-page-muted">Sort:</span>
                   <SelectValue class="font-semibold" />
@@ -377,9 +394,10 @@ onMounted(load);
                   <SelectItem v-for="s in SORTS" :key="s.value" :value="s.value">{{ s.label }}</SelectItem>
                 </SelectContent>
               </Select>
-              <p v-if="sortNote" class="-mt-1 text-right text-xs text-balance text-page-muted">{{ sortNote }}</p>
             </div>
           </div>
+          <!-- the ranking caveat sits under the rule, at reading size, not tucked under the trigger -->
+          <p v-if="sortNote && !focusItem" class="pt-2 text-[0.8125rem] font-medium text-pretty text-page-ink">{{ sortNote }}</p>
 
           <ul v-if="loading" class="grid grid-cols-[repeat(auto-fill,minmax(15.5rem,1fr))] gap-4 pt-4">
             <li v-for="i in 8" :key="i" class="label-stock flex flex-col gap-3 p-3">
@@ -389,14 +407,14 @@ onMounted(load);
             </li>
           </ul>
 
-          <ul v-else-if="focusItem" class="grid max-w-md pt-2">
+          <ul v-else-if="focusItem" id="results" tabindex="-1" class="grid max-w-md pt-2 outline-none">
             <li class="flex">
               <ProductCard v-if="isProduct(focusItem)" :item="focusItem" expanded class="w-full" />
-              <BundleCard v-else :item="focusItem" class="w-full" />
+              <BundleCard v-else :item="focusItem" full class="w-full" />
             </li>
           </ul>
 
-          <ul v-else class="grid grid-cols-[repeat(auto-fill,minmax(15.5rem,1fr))] gap-4 pt-4">
+          <ul v-else id="results" tabindex="-1" class="grid grid-cols-[repeat(auto-fill,minmax(15.5rem,1fr))] gap-4 pt-4 outline-none">
             <li v-for="p in visible" :key="p.s" class="flex">
               <ProductCard v-if="isProduct(p)" :item="p" class="w-full" />
               <BundleCard v-else :item="p" class="w-full" />
@@ -418,7 +436,9 @@ onMounted(load);
           </div>
 
           <div ref="sentinel" class="flex justify-center py-10">
-            <Button v-if="hasMore && !focusItem" variant="outline" size="lg" class="rounded-none border-2 border-border" @click="more">Show more</Button>
+            <Button v-if="hasMore && !focusItem" variant="outline" size="lg" class="rounded-none border-2 border-border" @click="more">
+              Show more <span class="font-normal text-muted-foreground">({{ (filtered.length - visible.length).toLocaleString() }} left)</span>
+            </Button>
           </div>
         </div>
       </div>

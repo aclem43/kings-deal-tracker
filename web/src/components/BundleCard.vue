@@ -5,7 +5,7 @@ import Manifest from "./Manifest.vue";
 import { useFilters } from "@/composables/useFilters";
 import { bundleBadges, money, splitQty, type Bundle } from "@/lib/data";
 
-const props = defineProps<{ item: Bundle }>();
+const props = defineProps<{ item: Bundle; full?: boolean }>();
 const p = computed(() => props.item);
 const { state } = useFilters();
 // Each part, with the product being browsed ("containing …") marked.
@@ -15,14 +15,14 @@ const lines = computed(() => p.value.x.map((x, i) => {
 }));
 const showParts = computed(() => !!p.value.ps && Math.abs(p.value.sv) > 0.005);
 const compare = computed(() => {
-  if (showParts.value) return { label: "Parts", value: p.value.ps, hint: `Buying each part on its own today costs ${money(p.value.ps)}` };
-  if (p.value.recentDrop && p.value.pv != null) return { label: "Was", value: p.value.pv, hint: "The previous price" };
+  if (showParts.value) return { label: "Parts alone", value: p.value.ps, hint: `Buying each part on its own today costs ${money(p.value.ps)}` };
+  if (p.value.recentDrop && p.value.pv != null) return { label: "Was", value: p.value.pv, hint: "The previous price", was: true };
   return null;
 });
 </script>
 
 <template>
-  <ItemCard :item="p" :badges="bundleBadges(p)" :compare="compare">
-    <Manifest :sku="p.s" :lines="lines" />
+  <ItemCard :item="p" :badges="bundleBadges(p)" :compare="compare" :full="full">
+    <Manifest :sku="p.s" :lines="lines" :compact="!full" />
   </ItemCard>
 </template>
