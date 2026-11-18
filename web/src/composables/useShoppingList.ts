@@ -26,5 +26,11 @@ export function useShoppingList() {
   const remove = (sku: string) => setQty(sku, 0);
   const toggle = (sku: string) => (has(sku) ? remove(sku) : add(sku));
   const clear = () => { store.value = {}; };
-  return { items, has, setQty, add, remove, toggle, clear };
+  const replace = (next: Record<string, number>) => { store.value = { ...next }; };
+  const merge = (more: Record<string, number>) => {
+    const next = { ...items.value };
+    for (const [s, n] of Object.entries(more)) next[s] = Math.min(MAX_QTY, (next[s] ?? 0) + n);
+    store.value = next;
+  };
+  return { items, has, setQty, add, remove, toggle, clear, replace, merge };
 }

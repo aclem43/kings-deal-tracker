@@ -101,7 +101,7 @@ defineExpose({ focus: () => input.value?.focus() });
       aria-autocomplete="list"
       :aria-activedescendant="showList && active >= 0 ? optId(active) : undefined"
       :class="cn(
-        'h-10 w-full min-w-0 rounded-lg border border-input bg-card pr-9 pl-9 text-sm shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30',
+        'h-10 w-full min-w-0 border-2 border-input bg-card pr-9 pl-9 text-[0.9375rem] text-card-foreground outline-none placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring pointer-coarse:h-11',
         inputClass,
       )"
       @input="open = true"
@@ -115,7 +115,7 @@ defineExpose({ focus: () => input.value?.focus() });
     <button
       v-if="q"
       type="button"
-      class="absolute top-1/2 right-2 -translate-y-1/2 rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+      class="absolute top-1/2 right-1 flex size-8 -translate-y-1/2 items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground"
       aria-label="Clear search"
       @click="clear"
     >
@@ -127,43 +127,43 @@ defineExpose({ focus: () => input.value?.focus() });
       :id="`${uid}-list`"
       role="listbox"
       :aria-label="label"
-      class="absolute inset-x-0 top-full z-40 mt-1.5 max-h-[min(28rem,70dvh)] overflow-y-auto overscroll-contain rounded-xl border bg-popover p-1.5 text-popover-foreground shadow-xl"
+      class="absolute inset-x-0 top-full z-40 mt-1 max-h-[min(28rem,70dvh)] min-w-[min(28rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain border-2 border-border bg-popover p-1 text-popover-foreground shadow-[0_12px_32px_-8px_rgb(0_0_0/0.35)]"
     >
       <template v-for="(g, gi) in groups" :key="g.label">
-        <div v-if="g.items.length" role="group" :aria-label="g.label" :class="gi > firstShown && 'mt-1 border-t pt-1'">
-          <div class="px-2.5 pt-1.5 pb-1 text-[0.7rem] font-medium tracking-wide text-muted-foreground uppercase">{{ g.label }}</div>
+        <div v-if="g.items.length" role="group" :aria-label="g.label" :class="gi > firstShown && 'mt-1 border-t border-rule pt-1'">
+          <div class="px-2.5 pt-1.5 pb-1 label-caps text-muted-foreground">{{ g.label }}</div>
           <div
             v-for="(s, i) in g.items"
             :id="optId(offsets[gi] + i)"
             :key="s.id"
             role="option"
             :aria-selected="active === offsets[gi] + i"
-            class="flex cursor-pointer items-center gap-3 rounded-lg px-2.5 text-sm aria-selected:bg-accent"
+            class="flex cursor-pointer items-center gap-3 px-2.5 text-sm aria-selected:bg-hivis aria-selected:text-hivis-ink"
             :class="[s.muted && 'opacity-60', s.image ? 'py-2' : 'py-1.5']"
             @mousedown.prevent
             @mousemove="active = offsets[gi] + i"
             @click="choose(s)"
           >
-            <img v-if="s.image" :src="s.image" alt="" class="size-9 shrink-0 rounded-md bg-white object-contain ring-1 ring-foreground/10" />
-            <span v-else-if="s.icon" class="flex size-7 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+            <img v-if="s.image" :src="s.image" alt="" class="size-9 shrink-0 border border-rule bg-white object-contain" />
+            <span v-else-if="s.icon" class="flex size-7 shrink-0 items-center justify-center bg-muted">
               <component :is="s.icon" class="size-4" />
             </span>
             <span class="min-w-0 flex-1">
               <span class="line-clamp-2 sm:line-clamp-1">
-                <template v-for="(r, ri) in highlight(s.label, q)" :key="ri"><mark v-if="r.m" class="bg-transparent font-semibold text-foreground">{{ r.t }}</mark><template v-else>{{ r.t }}</template></template>
+                <template v-for="(r, ri) in highlight(s.label, q)" :key="ri"><mark v-if="r.m" class="bg-transparent font-bold text-current">{{ r.t }}</mark><template v-else>{{ r.t }}</template></template>
               </span>
-              <span v-if="s.detail" class="block truncate text-xs text-muted-foreground">{{ s.detail }}</span>
+              <span v-if="s.detail" class="block truncate text-xs opacity-75">{{ s.detail }}</span>
             </span>
-            <span v-if="s.tag" class="shrink-0 rounded-md border px-1.5 py-0.5 text-xs text-muted-foreground">{{ s.tag }}</span>
-            <span v-if="s.aside" class="shrink-0 text-sm font-medium tabular-nums">{{ s.aside }}</span>
+            <span v-if="s.tag" class="shrink-0 border border-current px-1.5 py-0.5 label-caps opacity-75">{{ s.tag }}</span>
+            <span v-if="s.aside" class="shrink-0 text-sm font-semibold">{{ s.aside }}</span>
           </div>
         </div>
       </template>
       <p v-if="!flat.length" class="px-2.5 py-2 text-sm text-muted-foreground">{{ emptyText }}</p>
-      <p v-else class="mt-1 hidden items-center gap-1.5 border-t px-2.5 pt-2 pb-1 text-xs text-muted-foreground sm:flex">
-        <kbd class="rounded border bg-muted px-1 font-sans">↑</kbd><kbd class="rounded border bg-muted px-1 font-sans">↓</kbd> to pick
-        <kbd class="ml-2 inline-flex items-center rounded border bg-muted px-1 font-sans"><CornerDownLeft class="size-3" /></kbd> to choose
-        <kbd class="ml-2 rounded border bg-muted px-1 font-sans">esc</kbd> to close
+      <p v-else class="mt-1 hidden items-center gap-1.5 border-t border-rule px-2.5 pt-2 pb-1 text-xs text-muted-foreground sm:flex">
+        <kbd class="border border-rule bg-muted px-1 font-sans">↑</kbd><kbd class="border border-rule bg-muted px-1 font-sans">↓</kbd> to pick
+        <kbd class="ml-2 inline-flex items-center border border-rule bg-muted px-1 font-sans"><CornerDownLeft class="size-3" /></kbd> to choose
+        <kbd class="ml-2 border border-rule bg-muted px-1 font-sans">esc</kbd> to close
       </p>
     </div>
   </div>

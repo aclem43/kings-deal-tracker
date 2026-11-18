@@ -7,8 +7,17 @@ export const queryWords = (q: string) => q.toLowerCase().split(/\s+/).filter(Boo
 function score(p: Item, words: string[]): number {
   const title = shortName(p.n).toLowerCase();
   const name = p.n.toLowerCase();
+  const depts = p.d.join(" ").toLowerCase();
+  const cats = p.c.join(" ").toLowerCase();
+  // Spare parts and accessories mention the thing they fit ("Fridge Cover"), so a search
+  // for "fridge" should show fridges first unless the search asks for parts.
+  const wantsParts = words.some((w) => w.startsWith("part") || w.startsWith("spare") || w.startsWith("cover"));
   let s = 0;
+  if (!wantsParts && (p.d.includes("Spare Parts") || /^part\b|\bcover\b/i.test(title))) s -= 3;
   for (const w of words) {
+    // Being in a department named for the search ("Fridge/Freezers") beats mentioning it.
+    if (depts.includes(w)) s += 3;
+    else if (cats.includes(w)) s += 1;
     if (p.s.toLowerCase() === w) s += 100;
     else if (title.startsWith(w)) s += 5;
     else if (title.includes(" " + w)) s += 4;

@@ -1,0 +1,697 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-18T00:00:00Z",
+  "title": "Design System: Kings Deal Tracker",
+  "extensions": {
+    "colorMeta": {
+      "carton": {
+        "role": "neutral",
+        "displayName": "Kraft Carton",
+        "canonical": "oklch(0.745 0.08 72)",
+        "tonalRamp": [
+          "oklch(0.15 0.016 72)",
+          "oklch(0.26 0.034 72)",
+          "oklch(0.37 0.051 72)",
+          "oklch(0.48 0.069 72)",
+          "oklch(0.60 0.072 72)",
+          "oklch(0.72 0.053 72)",
+          "oklch(0.84 0.034 72)",
+          "oklch(0.95 0.016 72)"
+        ]
+      },
+      "carton-ink": {
+        "role": "neutral",
+        "displayName": "Carton Ink",
+        "canonical": "oklch(0.2 0.02 60)",
+        "tonalRamp": [
+          "oklch(0.15 0.020 60)",
+          "oklch(0.26 0.020 60)",
+          "oklch(0.37 0.020 60)",
+          "oklch(0.48 0.020 60)",
+          "oklch(0.60 0.020 60)",
+          "oklch(0.72 0.020 60)",
+          "oklch(0.84 0.020 60)",
+          "oklch(0.95 0.020 60)"
+        ]
+      },
+      "carton-muted": {
+        "role": "neutral",
+        "displayName": "Carton Muted",
+        "canonical": "oklch(0.31 0.045 62)",
+        "tonalRamp": [
+          "oklch(0.15 0.009 62)",
+          "oklch(0.26 0.019 62)",
+          "oklch(0.37 0.029 62)",
+          "oklch(0.48 0.039 62)",
+          "oklch(0.60 0.041 62)",
+          "oklch(0.72 0.030 62)",
+          "oklch(0.84 0.019 62)",
+          "oklch(0.95 0.009 62)"
+        ]
+      },
+      "bar": {
+        "role": "neutral",
+        "displayName": "Bar Black",
+        "canonical": "oklch(0.17 0.005 60)",
+        "tonalRamp": [
+          "oklch(0.15 0.005 60)",
+          "oklch(0.26 0.005 60)",
+          "oklch(0.37 0.005 60)",
+          "oklch(0.48 0.005 60)",
+          "oklch(0.60 0.005 60)",
+          "oklch(0.72 0.005 60)",
+          "oklch(0.84 0.005 60)",
+          "oklch(0.95 0.005 60)"
+        ]
+      },
+      "bar-ink": {
+        "role": "neutral",
+        "displayName": "Bar Ink",
+        "canonical": "oklch(0.975 0.006 90)",
+        "tonalRamp": [
+          "oklch(0.15 0.006 90)",
+          "oklch(0.26 0.006 90)",
+          "oklch(0.37 0.006 90)",
+          "oklch(0.48 0.006 90)",
+          "oklch(0.60 0.006 90)",
+          "oklch(0.72 0.006 90)",
+          "oklch(0.84 0.006 90)",
+          "oklch(0.95 0.006 90)"
+        ]
+      },
+      "bar-muted": {
+        "role": "neutral",
+        "displayName": "Bar Muted",
+        "canonical": "oklch(0.78 0.015 80)",
+        "tonalRamp": [
+          "oklch(0.15 0.015 80)",
+          "oklch(0.26 0.015 80)",
+          "oklch(0.37 0.015 80)",
+          "oklch(0.48 0.015 80)",
+          "oklch(0.60 0.015 80)",
+          "oklch(0.72 0.015 80)",
+          "oklch(0.84 0.015 80)",
+          "oklch(0.95 0.015 80)"
+        ]
+      },
+      "hivis": {
+        "role": "primary",
+        "displayName": "Hi-Vis Handling Yellow",
+        "canonical": "oklch(0.837 0.171 90.3)",
+        "tonalRamp": [
+          "oklch(0.15 0.034 92)",
+          "oklch(0.26 0.071 92)",
+          "oklch(0.37 0.109 92)",
+          "oklch(0.48 0.146 92)",
+          "oklch(0.60 0.153 92)",
+          "oklch(0.72 0.112 92)",
+          "oklch(0.84 0.071 92)",
+          "oklch(0.95 0.034 92)"
+        ]
+      },
+      "hivis-ink": {
+        "role": "primary",
+        "displayName": "Hi-Vis Ink",
+        "canonical": "oklch(0.18 0.01 70)",
+        "tonalRamp": [
+          "oklch(0.15 0.010 70)",
+          "oklch(0.26 0.010 70)",
+          "oklch(0.37 0.010 70)",
+          "oklch(0.48 0.010 70)",
+          "oklch(0.60 0.010 70)",
+          "oklch(0.72 0.010 70)",
+          "oklch(0.84 0.010 70)",
+          "oklch(0.95 0.010 70)"
+        ]
+      },
+      "label": {
+        "role": "neutral",
+        "displayName": "Thermal Label",
+        "canonical": "oklch(0.984 0.004 90)",
+        "tonalRamp": [
+          "oklch(0.15 0.004 90)",
+          "oklch(0.26 0.004 90)",
+          "oklch(0.37 0.004 90)",
+          "oklch(0.48 0.004 90)",
+          "oklch(0.60 0.004 90)",
+          "oklch(0.72 0.004 90)",
+          "oklch(0.84 0.004 90)",
+          "oklch(0.95 0.004 90)"
+        ]
+      },
+      "ink": {
+        "role": "primary",
+        "displayName": "Routing Ink",
+        "canonical": "oklch(0.18 0.005 60)",
+        "tonalRamp": [
+          "oklch(0.15 0.005 60)",
+          "oklch(0.26 0.005 60)",
+          "oklch(0.37 0.005 60)",
+          "oklch(0.48 0.005 60)",
+          "oklch(0.60 0.005 60)",
+          "oklch(0.72 0.005 60)",
+          "oklch(0.84 0.005 60)",
+          "oklch(0.95 0.005 60)"
+        ]
+      },
+      "label-tint": {
+        "role": "neutral",
+        "displayName": "Label Tint",
+        "canonical": "oklch(0.94 0.01 85)",
+        "tonalRamp": [
+          "oklch(0.15 0.010 85)",
+          "oklch(0.26 0.010 85)",
+          "oklch(0.37 0.010 85)",
+          "oklch(0.48 0.010 85)",
+          "oklch(0.60 0.010 85)",
+          "oklch(0.72 0.010 85)",
+          "oklch(0.84 0.010 85)",
+          "oklch(0.95 0.010 85)"
+        ]
+      },
+      "label-muted-ink": {
+        "role": "neutral",
+        "displayName": "Label Muted Ink",
+        "canonical": "oklch(0.43 0.025 65)",
+        "tonalRamp": [
+          "oklch(0.15 0.005 65)",
+          "oklch(0.26 0.010 65)",
+          "oklch(0.37 0.016 65)",
+          "oklch(0.48 0.021 65)",
+          "oklch(0.60 0.023 65)",
+          "oklch(0.72 0.017 65)",
+          "oklch(0.84 0.011 65)",
+          "oklch(0.95 0.005 65)"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Hairline Rule",
+        "canonical": "oklch(0.86 0.015 80)",
+        "tonalRamp": [
+          "oklch(0.15 0.015 80)",
+          "oklch(0.26 0.015 80)",
+          "oklch(0.37 0.015 80)",
+          "oklch(0.48 0.015 80)",
+          "oklch(0.60 0.015 80)",
+          "oklch(0.72 0.015 80)",
+          "oklch(0.84 0.015 80)",
+          "oklch(0.95 0.015 80)"
+        ]
+      },
+      "good": {
+        "role": "secondary",
+        "displayName": "Saving Green",
+        "canonical": "oklch(0.47 0.13 150)",
+        "tonalRamp": [
+          "oklch(0.15 0.026 150)",
+          "oklch(0.26 0.055 150)",
+          "oklch(0.37 0.083 150)",
+          "oklch(0.48 0.112 150)",
+          "oklch(0.60 0.117 150)",
+          "oklch(0.72 0.086 150)",
+          "oklch(0.84 0.055 150)",
+          "oklch(0.95 0.026 150)"
+        ]
+      },
+      "good-bg": {
+        "role": "secondary",
+        "displayName": "Saving Green Wash",
+        "canonical": "oklch(0.93 0.055 150)",
+        "tonalRamp": [
+          "oklch(0.15 0.011 150)",
+          "oklch(0.26 0.023 150)",
+          "oklch(0.37 0.035 150)",
+          "oklch(0.48 0.047 150)",
+          "oklch(0.60 0.050 150)",
+          "oklch(0.72 0.036 150)",
+          "oklch(0.84 0.023 150)",
+          "oklch(0.95 0.011 150)"
+        ]
+      },
+      "bad": {
+        "role": "secondary",
+        "displayName": "Signal Red",
+        "canonical": "oklch(0.52 0.19 28)",
+        "tonalRamp": [
+          "oklch(0.15 0.038 28)",
+          "oklch(0.26 0.080 28)",
+          "oklch(0.37 0.122 28)",
+          "oklch(0.48 0.163 28)",
+          "oklch(0.60 0.171 28)",
+          "oklch(0.72 0.125 28)",
+          "oklch(0.84 0.080 28)",
+          "oklch(0.95 0.038 28)"
+        ]
+      },
+      "photo-well": {
+        "role": "neutral",
+        "displayName": "Photo Well",
+        "canonical": "oklch(1 0 0)"
+      },
+      "carton-night": {
+        "role": "neutral",
+        "displayName": "Kraft Carton (night)",
+        "canonical": "oklch(0.2 0.014 65)",
+        "tonalRamp": [
+          "oklch(0.15 0.014 65)",
+          "oklch(0.26 0.014 65)",
+          "oklch(0.37 0.014 65)",
+          "oklch(0.48 0.014 65)",
+          "oklch(0.60 0.014 65)",
+          "oklch(0.72 0.014 65)",
+          "oklch(0.84 0.014 65)",
+          "oklch(0.95 0.014 65)"
+        ]
+      },
+      "carton-ink-night": {
+        "role": "neutral",
+        "displayName": "Carton Ink (night)",
+        "canonical": "oklch(0.95 0.008 85)",
+        "tonalRamp": [
+          "oklch(0.15 0.008 85)",
+          "oklch(0.26 0.008 85)",
+          "oklch(0.37 0.008 85)",
+          "oklch(0.48 0.008 85)",
+          "oklch(0.60 0.008 85)",
+          "oklch(0.72 0.008 85)",
+          "oklch(0.84 0.008 85)",
+          "oklch(0.95 0.008 85)"
+        ]
+      },
+      "carton-muted-night": {
+        "role": "neutral",
+        "displayName": "Carton Muted (night)",
+        "canonical": "oklch(0.78 0.025 78)",
+        "tonalRamp": [
+          "oklch(0.15 0.005 78)",
+          "oklch(0.26 0.010 78)",
+          "oklch(0.37 0.016 78)",
+          "oklch(0.48 0.021 78)",
+          "oklch(0.60 0.023 78)",
+          "oklch(0.72 0.017 78)",
+          "oklch(0.84 0.011 78)",
+          "oklch(0.95 0.005 78)"
+        ]
+      },
+      "bar-night": {
+        "role": "neutral",
+        "displayName": "Bar Black (night)",
+        "canonical": "oklch(0.13 0.008 65)",
+        "tonalRamp": [
+          "oklch(0.15 0.008 65)",
+          "oklch(0.26 0.008 65)",
+          "oklch(0.37 0.008 65)",
+          "oklch(0.48 0.008 65)",
+          "oklch(0.60 0.008 65)",
+          "oklch(0.72 0.008 65)",
+          "oklch(0.84 0.008 65)",
+          "oklch(0.95 0.008 65)"
+        ]
+      },
+      "bar-muted-night": {
+        "role": "neutral",
+        "displayName": "Bar Muted (night)",
+        "canonical": "oklch(0.74 0.015 80)",
+        "tonalRamp": [
+          "oklch(0.15 0.015 80)",
+          "oklch(0.26 0.015 80)",
+          "oklch(0.37 0.015 80)",
+          "oklch(0.48 0.015 80)",
+          "oklch(0.60 0.015 80)",
+          "oklch(0.72 0.015 80)",
+          "oklch(0.84 0.015 80)",
+          "oklch(0.95 0.015 80)"
+        ]
+      },
+      "label-night": {
+        "role": "neutral",
+        "displayName": "Thermal Label (night)",
+        "canonical": "oklch(0.255 0.012 68)",
+        "tonalRamp": [
+          "oklch(0.15 0.012 68)",
+          "oklch(0.26 0.012 68)",
+          "oklch(0.37 0.012 68)",
+          "oklch(0.48 0.012 68)",
+          "oklch(0.60 0.012 68)",
+          "oklch(0.72 0.012 68)",
+          "oklch(0.84 0.012 68)",
+          "oklch(0.95 0.012 68)"
+        ]
+      },
+      "ink-night": {
+        "role": "primary",
+        "displayName": "Routing Ink (night)",
+        "canonical": "oklch(0.95 0.008 85)",
+        "tonalRamp": [
+          "oklch(0.15 0.008 85)",
+          "oklch(0.26 0.008 85)",
+          "oklch(0.37 0.008 85)",
+          "oklch(0.48 0.008 85)",
+          "oklch(0.60 0.008 85)",
+          "oklch(0.72 0.008 85)",
+          "oklch(0.84 0.008 85)",
+          "oklch(0.95 0.008 85)"
+        ]
+      },
+      "label-tint-night": {
+        "role": "neutral",
+        "displayName": "Label Tint (night)",
+        "canonical": "oklch(0.31 0.012 68)",
+        "tonalRamp": [
+          "oklch(0.15 0.012 68)",
+          "oklch(0.26 0.012 68)",
+          "oklch(0.37 0.012 68)",
+          "oklch(0.48 0.012 68)",
+          "oklch(0.60 0.012 68)",
+          "oklch(0.72 0.012 68)",
+          "oklch(0.84 0.012 68)",
+          "oklch(0.95 0.012 68)"
+        ]
+      },
+      "label-muted-ink-night": {
+        "role": "neutral",
+        "displayName": "Label Muted Ink (night)",
+        "canonical": "oklch(0.77 0.02 78)",
+        "tonalRamp": [
+          "oklch(0.15 0.020 78)",
+          "oklch(0.26 0.020 78)",
+          "oklch(0.37 0.020 78)",
+          "oklch(0.48 0.020 78)",
+          "oklch(0.60 0.020 78)",
+          "oklch(0.72 0.020 78)",
+          "oklch(0.84 0.020 78)",
+          "oklch(0.95 0.020 78)"
+        ]
+      },
+      "border-night": {
+        "role": "primary",
+        "displayName": "Label Border (night)",
+        "canonical": "oklch(0.6 0.02 75)",
+        "tonalRamp": [
+          "oklch(0.15 0.020 75)",
+          "oklch(0.26 0.020 75)",
+          "oklch(0.37 0.020 75)",
+          "oklch(0.48 0.020 75)",
+          "oklch(0.60 0.020 75)",
+          "oklch(0.72 0.020 75)",
+          "oklch(0.84 0.020 75)",
+          "oklch(0.95 0.020 75)"
+        ]
+      },
+      "rule-night": {
+        "role": "neutral",
+        "displayName": "Hairline Rule (night)",
+        "canonical": "oklch(0.36 0.012 68)",
+        "tonalRamp": [
+          "oklch(0.15 0.012 68)",
+          "oklch(0.26 0.012 68)",
+          "oklch(0.37 0.012 68)",
+          "oklch(0.48 0.012 68)",
+          "oklch(0.60 0.012 68)",
+          "oklch(0.72 0.012 68)",
+          "oklch(0.84 0.012 68)",
+          "oklch(0.95 0.012 68)"
+        ]
+      },
+      "good-night": {
+        "role": "secondary",
+        "displayName": "Saving Green (night)",
+        "canonical": "oklch(0.8 0.14 150)",
+        "tonalRamp": [
+          "oklch(0.15 0.028 150)",
+          "oklch(0.26 0.059 150)",
+          "oklch(0.37 0.090 150)",
+          "oklch(0.48 0.120 150)",
+          "oklch(0.60 0.126 150)",
+          "oklch(0.72 0.092 150)",
+          "oklch(0.84 0.059 150)",
+          "oklch(0.95 0.028 150)"
+        ]
+      },
+      "good-bg-night": {
+        "role": "secondary",
+        "displayName": "Saving Green Wash (night)",
+        "canonical": "oklch(0.32 0.06 150)",
+        "tonalRamp": [
+          "oklch(0.15 0.012 150)",
+          "oklch(0.26 0.025 150)",
+          "oklch(0.37 0.038 150)",
+          "oklch(0.48 0.052 150)",
+          "oklch(0.60 0.054 150)",
+          "oklch(0.72 0.040 150)",
+          "oklch(0.84 0.025 150)",
+          "oklch(0.95 0.012 150)"
+        ]
+      },
+      "bad-night": {
+        "role": "secondary",
+        "displayName": "Signal Red (night)",
+        "canonical": "oklch(0.72 0.17 28)",
+        "tonalRamp": [
+          "oklch(0.15 0.034 28)",
+          "oklch(0.26 0.071 28)",
+          "oklch(0.37 0.109 28)",
+          "oklch(0.48 0.146 28)",
+          "oklch(0.60 0.153 28)",
+          "oklch(0.72 0.112 28)",
+          "oklch(0.84 0.071 28)",
+          "oklch(0.95 0.034 28)"
+        ]
+      },
+      "photo-well-ink": {
+        "role": "neutral",
+        "displayName": "Photo Well Ink",
+        "canonical": "oklch(0.62 0.012 70)"
+      },
+      "photo-well-night": {
+        "role": "neutral",
+        "displayName": "Photo Well (night)",
+        "canonical": "oklch(0.82 0.006 80)"
+      },
+      "photo-well-ink-night": {
+        "role": "neutral",
+        "displayName": "Photo Well Ink (night)",
+        "canonical": "oklch(0.45 0.012 70)"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page heading on the carton, one per view; 2.25rem from 640px; uppercase."
+      },
+      "price": {
+        "displayName": "Price",
+        "purpose": "Today's price in the routing block."
+      },
+      "price-total": {
+        "displayName": "Price Total",
+        "purpose": "Shopping-list plan total."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Panel, empty and error headings; uppercase."
+      },
+      "nav": {
+        "displayName": "Nav",
+        "purpose": "Black-bar view tabs; uppercase."
+      },
+      "band": {
+        "displayName": "Band",
+        "purpose": "Hi-vis handling band entries; uppercase."
+      },
+      "label-caps": {
+        "displayName": "Label Caps",
+        "purpose": "Rail headings, compare captions, Consignment, search groups; uppercase."
+      },
+      "badge": {
+        "displayName": "Badge",
+        "purpose": "Tone badges; uppercase."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Product names and intro copy."
+      },
+      "body-strong": {
+        "displayName": "Body Strong",
+        "purpose": "Chip and button text."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "How lines, manifest rows."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Stats, sort notes, filter reasons."
+      }
+    },
+    "shadows": [
+      {
+        "name": "overlay-drop",
+        "value": "0 12px 32px -8px rgb(0 0 0 / 0.35)",
+        "purpose": "Search autocomplete list only; everything else is flat."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-colour",
+        "value": "150ms ease (Tailwind transition-colors default)",
+        "purpose": "Fill changes on hover and press for chips, buttons and toggles."
+      },
+      {
+        "name": "disclosure",
+        "value": "rotate 90deg, 150ms",
+        "purpose": "Chevron on the Other bundles disclosure."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "0.01ms",
+        "purpose": "All transitions and animations collapse under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "coarse-pointer",
+        "value": "(pointer: coarse)"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Product Label",
+      "kind": "card",
+      "refersTo": "label-stock",
+      "description": "Thermal label on carton: photo well, name, routing block, badges, manifest.",
+      "html": "<article class=\"ds-label\"><div class=\"ds-well\"></div><p class=\"ds-name\"><b>Kings Caravan Floor Mat</b> <span>\u00b7 Reversible \u00b7 5m x 2.4m</span></p><div class=\"ds-route\"><span class=\"ds-price\">$76.95</span><span class=\"ds-cmp\"><small>Alone</small><s>$169.00</s></span></div><div class=\"ds-body\"><p class=\"ds-how\">Cheapest inside a bundle</p><span class=\"ds-badge\">54% less than alone</span></div></article>",
+      "css": ".ds-label{display:flex;flex-direction:column;width:16rem;border:2px solid var(--border);background:var(--card);color:var(--card-foreground);font-family:Barlow,system-ui,sans-serif;font-variant-numeric:tabular-nums}.ds-well{height:6rem;background:#fff;border-bottom:2px solid var(--border)}.ds-name{margin:0;padding:10px 12px 8px;font-size:.9375rem;line-height:1.375}.ds-name b{font-weight:600}.ds-name span{color:var(--muted-foreground)}.ds-route{display:grid;grid-template-columns:auto 1fr;border-top:2px solid var(--border)}.ds-price{background:var(--primary);color:var(--primary-foreground);padding:4px 12px;font:700 2rem/1.25 'Barlow Condensed',Barlow,sans-serif}.ds-cmp{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;padding:0 12px;line-height:1.25}.ds-cmp small{font:700 .8125rem 'Barlow Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-foreground)}.ds-cmp s{font-weight:600}.ds-body{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:8px 12px 12px}.ds-how{margin:0;font-size:.8125rem;color:var(--muted-foreground)}.ds-badge{background:var(--good);color:var(--background);padding:2px 6px;font:700 .8125rem/1.25 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase}"
+    },
+    {
+      "name": "Consignment Manifest",
+      "kind": "custom",
+      "refersTo": "manifest-line-marked",
+      "description": "The winning bundle counted out piece by piece, this product's line marked.",
+      "html": "<a class=\"ds-manifest\" href=\"#\"><p><small>Consignment</small><b>SC-CO-CMAT5X2.4-CLEARTOPBAG</b></p><ul><li class=\"on\"><span>Kings Caravan Floor Mat</span><b>PCS 1/2</b></li><li><span>Kings Clear Top Canvas Bag</span><b>PCS 2/2</b></li></ul></a>",
+      "css": ".ds-manifest{display:block;width:15rem;border:2px solid var(--border);color:var(--card-foreground);background:var(--card);text-decoration:none;font-family:Barlow,sans-serif;font-variant-numeric:tabular-nums}.ds-manifest:hover{background:var(--muted)}.ds-manifest:focus-visible{outline:2px solid var(--ring);outline-offset:2px}.ds-manifest p{margin:0;padding:4px 8px 2px;border-bottom:1px solid var(--rule);line-height:1.25}.ds-manifest small{display:block;font:700 .6875rem 'Barlow Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-foreground)}.ds-manifest p b{display:block;font:700 .8125rem 'Barlow Condensed',sans-serif;letter-spacing:.04em;word-break:break-all}.ds-manifest ul{list-style:none;margin:0;padding:0;font-size:.8125rem;line-height:1.375}.ds-manifest li{display:flex;justify-content:space-between;gap:8px;padding:4px 8px;border-top:1px solid var(--rule)}.ds-manifest li:first-child{border-top:0}.ds-manifest li.on{background:var(--good-bg);font-weight:600}.ds-manifest li b{flex-shrink:0;font:700 .8125rem 'Barlow Condensed',sans-serif;letter-spacing:.04em;white-space:nowrap}"
+    },
+    {
+      "name": "Tone Badges",
+      "kind": "chip",
+      "refersTo": "tone-badge-good",
+      "description": "Three signal tones only: saving, take note, dearer.",
+      "html": "<div class=\"ds-tones\"><span class=\"ds-tone ds-good\">54% less than alone</span><span class=\"ds-tone ds-warn\" title=\"Usual price from day 14\">New low</span><span class=\"ds-tone ds-bad\">$40 more than parts</span></div>",
+      "css": ".ds-tones{display:flex;flex-wrap:wrap;gap:4px}.ds-tone{display:inline-flex;align-items:center;padding:2px 6px;font:700 .8125rem/1.25 'Barlow Condensed',Barlow,sans-serif;letter-spacing:.06em;text-transform:uppercase}.ds-good{background:var(--good);color:var(--background)}.ds-warn{background:var(--hivis);color:var(--hivis-ink);cursor:help}.ds-bad{background:var(--bad);color:var(--background)}"
+    },
+    {
+      "name": "Filter Chips",
+      "kind": "chip",
+      "refersTo": "filter-chip",
+      "description": "Ruled rows with result counts; pressed reverses; empty ones disabled with a reason.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip\" aria-pressed=\"true\"><span>In stock</span><span>536</span></button><button class=\"ds-chip\" aria-pressed=\"false\"><span>Cheaper in a bundle</span><span>282</span></button><button class=\"ds-chip\" disabled><span>At all-time low</span><span>0</span></button><p class=\"ds-why\">Needs price changes; history is still building</p></div>",
+      "css": ".ds-chips{display:flex;flex-direction:column;gap:6px;width:15rem;font-variant-numeric:tabular-nums}.ds-chip{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:36px;padding:0 10px;border:2px solid var(--border);border-radius:0;background:var(--card);color:var(--card-foreground);font:600 .875rem Barlow,sans-serif;text-align:left;cursor:pointer;transition:background-color .15s,color .15s}.ds-chip span:last-child{font-weight:500}.ds-chip:hover{background:var(--muted)}.ds-chip:focus-visible{outline:2px solid var(--ring);outline-offset:2px}.ds-chip[aria-pressed=true]{background:var(--primary);color:var(--primary-foreground)}.ds-chip:disabled{cursor:not-allowed;border-style:dashed;background:color-mix(in oklab,var(--card) 60%,transparent);color:var(--muted-foreground)}.ds-why{margin:-4px 0 4px;font:400 .75rem Barlow,sans-serif;color:var(--page-muted)}"
+    },
+    {
+      "name": "Black Bar and Hi-Vis Band",
+      "kind": "nav",
+      "refersTo": "black-bar",
+      "description": "Top bar with mark and condensed tabs; the handling band of status under it.",
+      "html": "<header class=\"ds-bar\"><a class=\"ds-mark\" href=\"#\"><svg viewBox=\"0 0 32 32\" width=\"28\" height=\"28\" aria-hidden=\"true\"><path d=\"M2 2h28v20l-8 8H2z\" fill=\"#f4c300\"/><path d=\"M30 22h-8v8\" fill=\"none\" stroke=\"#13110f\" stroke-width=\"2\"/><path d=\"M7 10l6 6 4-4 7 7\" fill=\"none\" stroke=\"#13110f\" stroke-width=\"3\"/></svg>Kings Deal Tracker</a><nav><a href=\"#\" aria-current=\"page\">Products</a><a href=\"#\">Bundles</a><a href=\"#\">List <span>3</span></a></nav></header><ul class=\"ds-band\"><li>Unofficial price tracker</li><li>Prices pulled 17 Nov, 9:11 pm</li><li>Tracking 2 days \u00b7 usual prices from day 14</li></ul>",
+      "css": ".ds-bar{display:flex;align-items:center;gap:24px;padding:10px 24px;background:var(--bar);color:var(--bar-ink)}.ds-mark{display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none;font:800 1.25rem 'Barlow Condensed',sans-serif;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}.ds-bar nav{display:flex;gap:4px}.ds-bar nav a{display:flex;align-items:center;gap:6px;min-height:40px;padding:0 16px;color:var(--bar-muted);text-decoration:none;font:700 1rem 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase}.ds-bar nav a:hover{color:var(--bar-ink)}.ds-bar nav a:focus-visible{outline:2px solid var(--hivis);outline-offset:2px}.ds-bar nav a[aria-current=page]{background:var(--bar-ink);color:var(--bar)}.ds-bar nav a span{background:var(--hivis);color:var(--hivis-ink);padding:0 6px;font:700 .75rem/1.25rem Barlow,sans-serif}.ds-band{display:flex;flex-wrap:wrap;gap:2px 24px;margin:0;padding:6px 24px;list-style:none;background:var(--hivis);color:var(--hivis-ink);font:700 .875rem 'Barlow Condensed',sans-serif;letter-spacing:.05em;text-transform:uppercase}"
+    },
+    {
+      "name": "Search Input",
+      "kind": "input",
+      "refersTo": "search-input",
+      "description": "Square ruled field with inset icon; autocomplete highlights in hi-vis.",
+      "html": "<label class=\"ds-search\"><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/></svg><input placeholder=\"Search products, categories or SKU\" aria-label=\"Search\"></label>",
+      "css": ".ds-search{position:relative;display:block;width:20rem}.ds-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted-foreground)}.ds-search input{box-sizing:border-box;width:100%;height:40px;padding:0 36px;border:2px solid var(--input);border-radius:0;background:var(--card);color:var(--card-foreground);font:400 .9375rem Barlow,sans-serif;outline:none}.ds-search input::placeholder{color:var(--muted-foreground)}.ds-search input:focus-visible{outline:2px solid var(--ring);outline-offset:2px}"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ink block, square; the one decisive action.",
+      "html": "<button class=\"ds-btn\">Clear all filters</button>",
+      "css": ".ds-btn{height:40px;padding:0 24px;border:0;border-radius:0;background:var(--primary);color:var(--primary-foreground);font:500 .875rem Barlow,sans-serif;cursor:pointer;transition:background-color .15s}.ds-btn:hover{background:color-mix(in oklab,var(--primary) 85%,transparent)}.ds-btn:focus-visible{outline:2px solid var(--ring);outline-offset:2px}"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "2px ink rule on label stock; Show more, Undo, Clear list.",
+      "html": "<button class=\"ds-btn-o\">Show more</button>",
+      "css": ".ds-btn-o{height:40px;padding:0 24px;border:2px solid var(--border);border-radius:0;background:var(--background);color:var(--foreground);font:500 .875rem Barlow,sans-serif;cursor:pointer;transition:background-color .15s}.ds-btn-o:hover{background:var(--muted)}.ds-btn-o:focus-visible{outline:2px solid var(--ring);outline-offset:2px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Consignment Label",
+    "overview": "Every deal is a parcel on a kraft carton. The page ground is the carton itself, warm brown and matte; each product or bundle is a thermal-white label stuck to it, ruled in 2px ink with square corners and no shadow. Today's price is printed reversed in a black routing block, the winning bundle is counted out as a consignment manifest (\"PCS 1/2\"), and status that needs attention travels on a hi-vis yellow handling band under a black top bar. The world reads like road freight paperwork: dense, legible at arm's length, nothing decorative that is not also information.\n\nDensity is high and deliberate. Labels sit in a 4-up grid on desktop, the filter rail is a stack of ruled chips with their counts printed on them, and rank inside a label is made by weight, case and reversal (routing block, condensed caps, bold) rather than a third type size. Colour is rationed: green means a saving, red means dearer than the parts or above the usual price, yellow means take note. Everything else is ink, label stock and carton.\n\nAt night the same carton goes charcoal-brown, labels turn dark, and the routing block flips to a light block on dark stock. The black bar and the hi-vis band do not change: they are the fixed livery of the site.",
+    "keyCharacteristics": [
+      "Kraft-carton ground, thermal-white label stock, 2px ink rules, square corners, flat.",
+      "Price printed reversed in a routing block; the winning bundle shown as a manifest.",
+      "Barlow for reading, Barlow Condensed caps for labels, prices and headings; tabular figures everywhere.",
+      "Three signal colours with fixed meanings, and nothing else coloured.",
+      "Black top bar and hi-vis handling band, identical in light and dark."
+    ],
+    "rules": [
+      {
+        "name": "The Three Signals Rule",
+        "body": "Green is a saving, red is dearer than the parts or above usual, yellow is \"take note\". No colour carries any other meaning, and no element is coloured for decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The Fixed Livery Rule",
+        "body": "The black bar and the hi-vis band keep the same colours in light and dark mode; only the carton and the labels change.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ink Border Rule",
+        "body": "A label's outer edge is 2px of the ink token (in dark mode the lighter `border-night`). Inner divisions use the 1px hairline rule. Never invert that.",
+        "section": "colors"
+      },
+      {
+        "name": "The Readout Rule",
+        "body": "Tabular figures everywhere; never switch a number to proportional figures to make it look tighter.",
+        "section": "typography"
+      },
+      {
+        "name": "The Three Levers Rule",
+        "body": "Inside a label, rank comes from weight, case and reversal, not from adding another size. If a new element needs emphasis, make it bold, condensed caps or reversed before making it bigger.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Stock Rule",
+        "body": "Labels, chips, buttons, badges and the manifest have no shadow at rest or on hover; state changes are fill changes.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do build every new surface out of label stock on carton: label fill, 2px ink border, square corners, no shadow.",
+      "Do print the deciding number in a routing block (ink fill, condensed bold, tabular figures) with its comparison beside it.",
+      "Do put the caveat next to the number it qualifies, as a \"how\" line, a badge title or a band entry.",
+      "Do show a filter's result count on the chip, and when it is 0, disable it with a dashed border and say why.",
+      "Do keep green for savings, red for dearer or above usual, and hi-vis yellow for take-note, in both themes.",
+      "Do grow touch targets to 44px on coarse pointers."
+    ],
+    "donts": [
+      "Don't use rounded corners, soft cards or drop shadows on labels, chips, buttons or badges; the only shadow is the floating autocomplete list.",
+      "Don't colour anything for decoration, including a blue or brand accent; there are three signal colours and they mean one thing each.",
+      "Don't use red for errors, destructive actions or emphasis; red means dearer than the parts or above the usual price.",
+      "Don't add a third size inside a label to rank things; use weight, condensed caps or reversal.",
+      "Don't draw a sparkline for a price that has not moved.",
+      "Don't change the black bar or the hi-vis band between light and dark mode.",
+      "Don't borrow 4WD Supacentre or Adventure Kings logos, colours or branding; the site's own mark is the hi-vis tag."
+    ]
+  }
+}

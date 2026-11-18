@@ -75,6 +75,13 @@ export const pct = (v: number) => Math.round(v * 100) + "%";
 export const daysAgo = (iso: string) => Math.round((today.getTime() - new Date(iso).getTime()) / DAY);
 export const shortName = (n: string) => n.split("|")[0].trim();
 
+// Bundle part names come as "Kings Lantern ×4"; split off the count.
+export function splitQty(s: string): { name: string; qty: number } {
+  const m = s.match(/^(.*?)\s*×(\d+)$/);
+  return m ? { name: m[1], qty: +m[2] } : { name: s, qty: 1 };
+}
+
+
 export function enrich<T extends BaseRaw>(p: T): T & Derived {
   const dropped = p.pv != null && p.p < p.pv;
   return Object.assign(p, {
@@ -89,15 +96,18 @@ export function enrich<T extends BaseRaw>(p: T): T & Derived {
 export const isProduct = (p: Item): p is Product => "via" in p;
 
 export type Tone = "good" | "warn" | "bad";
-export interface BadgeInfo { text: string; tone: Tone }
+// `hint` says what a number is measured against; it shows as the badge's tooltip.
+export interface BadgeInfo { text: string; tone: Tone; hint?: string }
+
+export const USUAL_HINT = "Usual price: the median price over the last 90 days";
 
 export function historyBadges(p: Item): BadgeInfo[] {
   const out: BadgeInfo[] = [];
   const bt = p.belowTypical;
-  if (bt != null && bt >= 0.02) out.push({ text: `${pct(bt)} below usual`, tone: "good" });
-  if (p.atLow) out.push({ text: "All-time low", tone: "good" });
-  if (p.recentDrop && bt == null) out.push({ text: `Down ${pct(p.dropPct)}`, tone: "good" });
-  if (bt != null && bt <= -0.02) out.push({ text: `${pct(-bt)} above usual`, tone: "warn" });
+  if (bt != null && bt >= 0.02) out.push({ text: `${pct(bt)} below usual`, tone: "good", hint: USUAL_HINT });
+  if (p.atLow) out.push({ text: "All-time low", tone: "good", hint: "The lowest price seen since tracking began" });
+  if (p.recentDrop && bt == null) out.push({ text: `Down ${pct(p.dropPct)}`, tone: "good", hint: `Compared with the previous price, ${money(p.pv!)}` });
+  if (bt != null && bt <= -0.02) out.push({ text: `${pct(-bt)} above usual`, tone: "bad", hint: USUAL_HINT });
   if (!p.st) out.push({ text: "Out of stock", tone: "warn" });
   return out;
 }
@@ -106,8 +116,8 @@ export function productBadges(p: Product): BadgeInfo[] {
   const out = historyBadges(p);
   if (p.via) {
     out.unshift(p.sv >= 0.01
-      ? { text: `${pct(p.sv)} less than alone`, tone: "good" }
-      : { text: "Extras free", tone: "good" });
+      ? { text: `${pct(p.sv)} less than alone`, tone: "good", hint: `Compared with the store's own price for it alone today, ${money(p.sp)}` }
+      : { text: "Extras free", tone: "good", hint: "Same price as buying it alone, with extra items included" });
   }
   return out;
 }
@@ -115,18 +125,23 @@ export function productBadges(p: Product): BadgeInfo[] {
 export function bundleBadges(p: Bundle): BadgeInfo[] {
   const out = historyBadges(p);
   if (p.ps) {
-    if (p.sv < -0.005) out.unshift({ text: `${money(p.p - p.ps)} more than parts`, tone: "bad" });
-    else if (p.sv > 0.005) out.unshift({ text: `${pct(p.sv)} off the parts`, tone: "good" });
+    const hint = `Compared with buying each part on its own today, ${money(p.ps)}`;
+    if (p.sv < -0.005) out.unshift({ text: `${money(p.p - p.ps)} more than parts`, tone: "bad", hint });
+    else if (p.sv > 0.005) out.unshift({ text: `${pct(p.sv)} off the parts`, tone: "good", hint });
   }
   return out;
 }
 
+// Only says something once the price has moved or a usual price exists; until then the
+// header band explains that history is still building, so cards stay quiet.
 export function statsLine(p: Item): string {
   return [
-    p.hi > p.lo ? `Low ${money(p.lo)} · High ${money(p.hi)}` : "No price change seen yet",
+    p.hi > p.lo ? `Low ${money(p.lo)} · High ${money(p.hi)}` : "",
     p.ty ? `Usual ${money(p.ty)}` : "",
   ].filter(Boolean).join(" · ");
 }
+
+export const hasHistory = (p: Item) => p.hi > p.lo || p.ty != null;
 
 export function imageUrl(p: Item): string {
   return p.i ? `${p.i}?width=320&height=240&fit=bounds&quality=75` : "";

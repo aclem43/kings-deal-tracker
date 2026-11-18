@@ -1,33 +1,32 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&display=swap');
 
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+  Consignment Label: a kraft-carton ground, thermal-white labels ruled in ink, a black top
+  bar and a hi-vis handling band. Green means a saving, red means dearer than the parts or
+  above the usual price, yellow means "take note". Nothing else is coloured.
+*/
 @theme inline {
   --color-page: var(--page);
-  --color-brand: var(--brand);
+  --color-page-ink: var(--page-ink);
+  --color-page-muted: var(--page-muted);
+  --color-bar: var(--bar);
+  --color-bar-ink: var(--bar-ink);
+  --color-bar-muted: var(--bar-muted);
+  --color-hivis: var(--hivis);
+  --color-hivis-ink: var(--hivis-ink);
+  --color-rule: var(--rule);
+  --color-well: var(--well);
+  --color-well-ink: var(--well-ink);
   --color-good: var(--good);
   --color-good-bg: var(--good-bg);
-  --color-warn: var(--warn);
-  --color-warn-bg: var(--warn-bg);
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
+  --color-bad: var(--bad);
+  --font-sans: "Barlow", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Barlow Condensed", "Barlow", ui-sans-serif, system-ui, sans-serif;
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -56,93 +55,126 @@
 }
 
 :root {
-  --page: oklch(0.975 0.003 75);
-  --brand: oklch(0.53 0.21 25);
-  --good: oklch(0.48 0.12 150);
-  --good-bg: oklch(0.95 0.04 150);
-  --warn: oklch(0.5 0.1 75);
-  --warn-bg: oklch(0.96 0.06 90);
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.147 0.004 49.25);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.147 0.004 49.25);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.147 0.004 49.25);
-  --primary: oklch(0.216 0.006 56.043);
-  --primary-foreground: oklch(0.985 0.001 106.423);
-  --secondary: oklch(0.97 0.001 106.424);
-  --secondary-foreground: oklch(0.216 0.006 56.043);
-  --muted: oklch(0.97 0.001 106.424);
-  --muted-foreground: oklch(0.553 0.013 58.071);
-  --accent: oklch(0.97 0.001 106.424);
-  --accent-foreground: oklch(0.216 0.006 56.043);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.923 0.003 48.717);
-  --input: oklch(0.923 0.003 48.717);
-  --ring: oklch(0.709 0.01 56.259);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0.001 106.423);
-  --sidebar-foreground: oklch(0.147 0.004 49.25);
-  --sidebar-primary: oklch(0.216 0.006 56.043);
-  --sidebar-primary-foreground: oklch(0.985 0.001 106.423);
-  --sidebar-accent: oklch(0.97 0.001 106.424);
-  --sidebar-accent-foreground: oklch(0.216 0.006 56.043);
-  --sidebar-border: oklch(0.923 0.003 48.717);
-  --sidebar-ring: oklch(0.709 0.01 56.259);
+  --radius: 0.125rem;
+
+  /* the carton */
+  --page: oklch(0.745 0.08 72);
+  --page-ink: oklch(0.2 0.02 60);
+  --page-muted: oklch(0.31 0.045 62);
+
+  /* the top bar */
+  --bar: oklch(0.17 0.005 60);
+  --bar-ink: oklch(0.975 0.006 90);
+  --bar-muted: oklch(0.78 0.015 80);
+
+  /* the handling band */
+  --hivis: oklch(0.837 0.171 90.3); /* #f4c300, the same yellow as the mark */
+  --hivis-ink: oklch(0.18 0.01 70);
+
+  /* the label */
+  --background: oklch(0.984 0.004 90);
+  --foreground: oklch(0.18 0.005 60);
+  --card: oklch(0.984 0.004 90);
+  --card-foreground: oklch(0.18 0.005 60);
+  --popover: oklch(0.984 0.004 90);
+  --popover-foreground: oklch(0.18 0.005 60);
+  --primary: oklch(0.18 0.005 60);
+  --primary-foreground: oklch(0.984 0.004 90);
+  --secondary: oklch(0.94 0.01 85);
+  --secondary-foreground: oklch(0.18 0.005 60);
+  --muted: oklch(0.94 0.01 85);
+  --muted-foreground: oklch(0.43 0.025 65);
+  --accent: oklch(0.94 0.01 85);
+  --accent-foreground: oklch(0.18 0.005 60);
+  --border: oklch(0.18 0.005 60);
+  --rule: oklch(0.86 0.015 80);
+
+  /* the photo well: white behind store photos, a warm grey at night */
+  --well: oklch(1 0 0);
+  --well-ink: oklch(0.62 0.012 70);
+  --input: oklch(0.18 0.005 60);
+  --ring: oklch(0.18 0.005 60);
+
+  --good: oklch(0.47 0.13 150);
+  --good-bg: oklch(0.93 0.055 150);
+  --bad: oklch(0.52 0.19 28);
+  --destructive: oklch(0.52 0.19 28);
 }
 
+/* The same carton at night: a charcoal-brown ground, dark labels, light routing blocks. */
 .dark {
-  --page: oklch(0.147 0.004 49.25);
-  --brand: oklch(0.68 0.19 20);
-  --good: oklch(0.8 0.13 150);
-  --good-bg: oklch(0.3 0.05 150);
-  --warn: oklch(0.85 0.12 90);
-  --warn-bg: oklch(0.32 0.05 85);
-  --background: oklch(0.147 0.004 49.25);
-  --foreground: oklch(0.985 0.001 106.423);
-  --card: oklch(0.216 0.006 56.043);
-  --card-foreground: oklch(0.985 0.001 106.423);
-  --popover: oklch(0.216 0.006 56.043);
-  --popover-foreground: oklch(0.985 0.001 106.423);
-  --primary: oklch(0.923 0.003 48.717);
-  --primary-foreground: oklch(0.216 0.006 56.043);
-  --secondary: oklch(0.268 0.007 34.298);
-  --secondary-foreground: oklch(0.985 0.001 106.423);
-  --muted: oklch(0.268 0.007 34.298);
-  --muted-foreground: oklch(0.709 0.01 56.259);
-  --accent: oklch(0.268 0.007 34.298);
-  --accent-foreground: oklch(0.985 0.001 106.423);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.553 0.013 58.071);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.216 0.006 56.043);
-  --sidebar-foreground: oklch(0.985 0.001 106.423);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0.001 106.423);
-  --sidebar-accent: oklch(0.268 0.007 34.298);
-  --sidebar-accent-foreground: oklch(0.985 0.001 106.423);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.553 0.013 58.071);
+  --page: oklch(0.2 0.014 65);
+  --page-ink: oklch(0.95 0.008 85);
+  --page-muted: oklch(0.78 0.025 78);
+
+  --bar: oklch(0.13 0.008 65);
+  --bar-ink: oklch(0.95 0.008 85);
+  --bar-muted: oklch(0.74 0.015 80);
+
+  --background: oklch(0.255 0.012 68);
+  --foreground: oklch(0.95 0.008 85);
+  --card: oklch(0.255 0.012 68);
+  --card-foreground: oklch(0.95 0.008 85);
+  --popover: oklch(0.255 0.012 68);
+  --popover-foreground: oklch(0.95 0.008 85);
+  --primary: oklch(0.95 0.008 85);
+  --primary-foreground: oklch(0.18 0.005 60);
+  --secondary: oklch(0.31 0.012 68);
+  --secondary-foreground: oklch(0.95 0.008 85);
+  --muted: oklch(0.31 0.012 68);
+  --muted-foreground: oklch(0.77 0.02 78);
+  --accent: oklch(0.31 0.012 68);
+  --accent-foreground: oklch(0.95 0.008 85);
+  --border: oklch(0.6 0.02 75);
+  --rule: oklch(0.36 0.012 68);
+  --well: oklch(0.82 0.006 80);
+  --well-ink: oklch(0.45 0.012 70);
+  --input: oklch(0.6 0.02 75);
+  --ring: oklch(0.837 0.171 90.3);
+
+  --good: oklch(0.8 0.14 150);
+  --good-bg: oklch(0.32 0.06 150);
+  --bad: oklch(0.72 0.17 28);
+  --destructive: oklch(0.72 0.17 28);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-page text-foreground font-sans antialiased;
+  html {
+    color-scheme: light;
+    scrollbar-color: var(--page-muted) var(--page);
+    accent-color: var(--foreground);
   }
-  html { color-scheme: light; }
   html.dark { color-scheme: dark; }
+  body {
+    @apply bg-page text-page-ink font-sans antialiased;
+    font-variant-numeric: tabular-nums;
+    caret-color: currentColor;
+  }
+  ::selection {
+    background: var(--hivis);
+    color: var(--hivis-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  a { text-underline-offset: 0.18em; }
+}
+
+@layer components {
+  /* A label: thermal stock ruled in ink, square corners, no shadow. */
+  .label-stock {
+    @apply border-2 border-border bg-card text-card-foreground;
+  }
+  /* Condensed caps for labels and rail headings. */
+  .label-caps {
+    @apply font-heading text-[0.8125rem] font-bold tracking-[0.08em] uppercase;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }

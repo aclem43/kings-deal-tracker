@@ -1,4 +1,4 @@
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import type { View } from "@/lib/data";
 
 // Filter state lives in the URL hash so a view can be shared. The format matches the
@@ -42,6 +42,25 @@ const DEFAULTS: FilterState = {
 
 const state = reactive<FilterState>({ ...DEFAULTS });
 
+// A shopping list shared as a link (#view=list&items=SKU:2,SKU2:1). It is read once from
+// the hash and then handed to the list view, which asks before using it.
+const sharedList = ref<Record<string, number> | null>(null);
+
+export function parseItems(raw: string): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const part of raw.split(",")) {
+    const i = part.lastIndexOf(":");
+    const sku = (i > 0 ? part.slice(0, i) : part).trim();
+    const n = i > 0 ? parseInt(part.slice(i + 1), 10) : 1;
+    if (sku && n > 0) out[sku] = Math.min(20, n);
+  }
+  return out;
+}
+
+export function itemsParam(items: Record<string, number>): string {
+  return Object.entries(items).map(([s, n]) => `${s}:${n}`).join(",");
+}
+
 function readHash() {
   const h = new URLSearchParams(location.hash.slice(1));
   const v = h.get("view");
@@ -50,6 +69,8 @@ function readHash() {
   for (const k of TEXT) (state[k] as string) = h.get(k) ?? DEFAULTS[k];
   if (!SORTS.some((s) => s.value === state.sort)) state.sort = "deal";
   for (const k of FLAGS) state[k] = h.has(k) ? h.get(k) === "1" : DEFAULTS[k];
+  const items = h.get("items");
+  if (items) sharedList.value = parseItems(items);
 }
 
 function writeHash() {
@@ -71,6 +92,12 @@ function setDept(d: string) {
   Object.assign(state, { dept: d, sub: "" });
 }
 
+// Back to the defaults for the current view, keeping the view and the sort.
+function resetFilters() {
+  const { view, sort } = state;
+  Object.assign(state, { ...DEFAULTS, view, sort });
+}
+
 export function useFilters() {
-  return { state, readHash, writeHash, setView, setDept };
+  return { state, readHash, writeHash, setView, setDept, resetFilters, sharedList };
 }

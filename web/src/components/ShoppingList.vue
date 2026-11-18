@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { Gift, ImageOff, Minus, Plus, ShoppingCart, Trash2, TriangleAlert, X } from "@lucide/vue";
-import { Card } from "@/components/ui/card";
+import { computed, onBeforeUnmount, ref } from "vue";
+import { Check, Gift, ImageOff, Link2, Minus, Plus, ShoppingCart, Trash2, TriangleAlert, Undo2, X } from "@lucide/vue";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { money, pct, shortName, thumbUrl, type Bundle, type Product } from "@/lib/data";
 import { rankMatches } from "@/lib/search";
 import SearchAutocomplete, { type SuggestionGroup } from "./SearchAutocomplete.vue";
 import { optimise } from "@/lib/optimise";
 import { MAX_QTY, useShoppingList } from "@/composables/useShoppingList";
+import { itemsParam, useFilters } from "@/composables/useFilters";
 
-const props = defineProps<{ products: Product[]; bundles: Bundle[]; bySku: Map<string, Product> }>();
+const props = defineProps<{ products: Product[]; bundles: Bundle[]; bySku: Map<string, Product>; asOf: string }>();
 
 const list = useShoppingList();
+const { sharedList } = useFilters();
 const thumb = thumbUrl;
 const name = (sku: string) => shortName(props.bySku.get(sku)?.n ?? sku);
 
@@ -35,6 +35,55 @@ const saving = computed(() => {
   return { amount: p.separate - p.total, pct: (p.separate - p.total) / p.separate };
 });
 
+/* ---------- a list opened from a shared link ---------- */
+
+const incoming = computed(() => {
+  const s = sharedList.value;
+  if (!s) return null;
+  const known = Object.entries(s).filter(([sku]) => props.bySku.has(sku));
+  return known.length ? Object.fromEntries(known) : null;
+});
+const sameAsMine = computed(() => !!incoming.value && itemsParam(incoming.value) === itemsParam(list.items.value));
+function useShared(how: "replace" | "merge") {
+  if (!incoming.value) return;
+  if (how === "replace") list.replace(incoming.value);
+  else list.merge(incoming.value);
+  sharedList.value = null;
+}
+// With nothing on this browser's list yet, a shared list just becomes the list.
+if (incoming.value && !rows.value.length) useShared("replace");
+
+/* ---------- sharing and clearing ---------- */
+
+const copied = ref(false);
+let copiedTimer: number | undefined;
+async function copyLink() {
+  const url = `${location.origin}${location.pathname}#view=list&items=${encodeURIComponent(itemsParam(list.items.value)).replace(/%3A/g, ":").replace(/%2C/g, ",")}`;
+  try {
+    await navigator.clipboard.writeText(url);
+    copied.value = true;
+  } catch {
+    window.prompt("Copy this link", url);
+  }
+  clearTimeout(copiedTimer);
+  copiedTimer = window.setTimeout(() => { copied.value = false; }, 2500);
+}
+
+// Clearing keeps the old list for a while so it can be put back.
+const cleared = ref<Record<string, number> | null>(null);
+let undoTimer: number | undefined;
+function clearList() {
+  cleared.value = { ...list.items.value };
+  list.clear();
+  clearTimeout(undoTimer);
+  undoTimer = window.setTimeout(() => { cleared.value = null; }, 10000);
+}
+function undoClear() {
+  if (cleared.value) list.replace(cleared.value);
+  cleared.value = null;
+}
+onBeforeUnmount(() => { clearTimeout(undoTimer); clearTimeout(copiedTimer); });
+
 /* ---------- adding items ---------- */
 
 const q = ref("");
@@ -51,121 +100,164 @@ const groups = computed<SuggestionGroup[]>(() => [{
 }]);
 function add(sku: string) { list.add(sku); q.value = ""; }
 function addFirst() { const s = groups.value[0].items[0]; if (s) add(s.id); }
+
+const qtyBtn = "flex size-9 items-center justify-center hover:bg-muted disabled:opacity-40 pointer-coarse:size-11 [&_svg]:size-4";
 </script>
 
 <template>
-  <div class="grid items-start gap-4 pb-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
-    <!-- the list -->
-    <Card class="gap-0 overflow-visible py-0">
-      <div class="flex items-center justify-between gap-2 border-b p-4">
-        <h2 class="font-heading text-base font-semibold">Your list</h2>
-        <Button v-if="rows.length" variant="ghost" size="sm" class="text-muted-foreground" @click="list.clear()">
-          <Trash2 /> Clear
-        </Button>
-      </div>
-
-      <div class="border-b p-4">
-        <SearchAutocomplete
-          v-model="q"
-          :groups="groups"
-          placeholder="Add a product…"
-          label="Add a product"
-          empty-text="No products match."
-          @select="add($event.id)"
-          @submit="addFirst"
-        />
-      </div>
-
-      <ul v-if="rows.length" class="divide-y">
-        <li v-for="r in rows" :key="r.sku" class="flex items-center gap-3 px-4 py-3">
-          <a :href="r.p.u" target="_blank" rel="noopener" class="shrink-0">
-            <img v-if="r.p.i" :src="thumb(r.p.i)" alt="" class="size-12 rounded-md bg-white object-contain ring-1 ring-foreground/10" />
-            <span v-else class="flex size-12 items-center justify-center rounded-md bg-muted"><ImageOff class="size-5 text-muted-foreground" /></span>
-          </a>
-          <div class="min-w-0 flex-1">
-            <a :href="r.p.u" target="_blank" rel="noopener" class="line-clamp-2 text-sm leading-snug font-medium hover:underline">{{ shortName(r.p.n) }}</a>
-            <p class="text-xs text-muted-foreground">
-              <template v-if="r.p.sst">{{ money(r.p.sp) }} on its own</template>
-              <template v-else>Out of stock on its own</template>
-            </p>
-          </div>
-          <div class="flex shrink-0 items-center rounded-lg border">
-            <Button variant="ghost" size="icon-xs" aria-label="One fewer" @click="list.setQty(r.sku, r.qty - 1)"><Minus /></Button>
-            <span class="w-6 text-center text-sm tabular-nums" aria-live="polite">{{ r.qty }}</span>
-            <Button variant="ghost" size="icon-xs" aria-label="One more" :disabled="r.qty >= MAX_QTY" @click="list.setQty(r.sku, r.qty + 1)"><Plus /></Button>
-          </div>
-          <Button variant="ghost" size="icon-sm" class="text-muted-foreground" :aria-label="`Remove ${shortName(r.p.n)}`" @click="list.remove(r.sku)">
-            <X />
-          </Button>
-        </li>
-      </ul>
-      <div v-else class="flex flex-col items-center gap-2 px-6 py-12 text-center text-sm text-muted-foreground">
-        <ShoppingCart class="size-8 opacity-50" />
-        <p>Your list is empty. Search above, or use the cart button on any product.</p>
-      </div>
-    </Card>
-
-    <!-- the plan -->
-    <Card v-if="plan" class="gap-0 py-0 lg:sticky lg:top-4">
-      <div class="border-b p-4">
-        <h2 class="font-heading text-base font-semibold">Cheapest way to buy it</h2>
-        <div class="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <span class="text-3xl font-bold tracking-tight tabular-nums">{{ money(plan.total) }}</span>
-          <span class="text-sm text-muted-foreground">
-            {{ purchases }} purchase{{ purchases === 1 ? "" : "s" }}
-          </span>
-        </div>
-        <p v-if="saving" class="mt-2 inline-block rounded-md bg-good-bg px-2 py-1 text-sm font-medium text-good">
-          Saves {{ money(saving.amount) }} ({{ pct(saving.pct) }}) on buying each on its own ({{ money(plan.separate!) }})
-        </p>
-        <p v-else-if="plan.separate != null && plan.buys.length" class="mt-2 text-sm text-muted-foreground">
-          Buying each on its own is already the cheapest way.
-        </p>
-        <p v-if="!plan.exact" class="mt-2 text-xs text-muted-foreground">
-          This list is large, so this is a very good plan rather than a guaranteed best one.
-        </p>
-      </div>
-
-      <div v-if="plan.unavailable.length" class="flex gap-2 border-b bg-warn-bg p-4 text-sm text-warn">
-        <TriangleAlert class="mt-0.5 size-4 shrink-0" />
-        <p>
-          Not in stock anywhere right now, so not included:
-          <strong class="font-semibold">{{ plan.unavailable.map(name).join(", ") }}</strong>
-        </p>
-      </div>
-
-      <ul class="divide-y">
-        <li v-for="b in plan.buys" :key="b.listing.s" class="flex gap-3 p-4">
-          <a :href="b.listing.u" target="_blank" rel="noopener" class="shrink-0">
-            <img v-if="b.listing.i" :src="thumb(b.listing.i)" alt="" class="size-14 rounded-md bg-white object-contain ring-1 ring-foreground/10" />
-            <span v-else class="flex size-14 items-center justify-center rounded-md bg-muted"><ImageOff class="size-5 text-muted-foreground" /></span>
-          </a>
-          <div class="min-w-0 flex-1">
-            <div class="flex items-start justify-between gap-3">
-              <a :href="b.listing.u" target="_blank" rel="noopener" class="line-clamp-2 text-sm leading-snug font-medium hover:underline">
-                {{ shortName(b.listing.n) }}
-              </a>
-              <span class="text-right font-bold whitespace-nowrap tabular-nums">
-                <template v-if="b.count > 1"><span class="font-normal text-muted-foreground">{{ b.count }} × {{ money(b.listing.p) }}</span><br /></template>
-                {{ money(b.listing.p * b.count) }}
-              </span>
-            </div>
-            <Badge variant="outline" class="mt-1 rounded-md">{{ b.listing.bundle ? "Bundle" : "On its own" }}</Badge>
-            <p v-if="b.listing.bundle" class="mt-1.5 text-xs">
-              <span class="text-muted-foreground">For:</span>
-              {{ b.covers.map(([s, n]) => name(s) + (n > 1 ? ` ×${n}` : "")).join(", ") }}
-            </p>
-            <p v-if="b.extras.length" class="mt-1 flex gap-1 text-xs text-good">
-              <Gift class="mt-px size-3.5 shrink-0" />
-              <span>Also comes with {{ b.extras.map(([s, n]) => name(s) + (n > 1 ? ` ×${n}` : "")).join(", ") }}</span>
-            </p>
-          </div>
-        </li>
-      </ul>
-
-      <p class="border-t p-4 text-xs text-muted-foreground">
-        Uses today's in-stock prices for single products and every bundle. Check prices on the store before buying.
+  <div class="flex flex-col gap-4 pb-8">
+    <!-- a shared list, when this browser already has one of its own -->
+    <div v-if="incoming && !sameAsMine" role="status" class="flex flex-col gap-3 border-2 border-border bg-hivis p-4 text-hivis-ink sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-sm font-semibold">
+        This link has a list of {{ Object.keys(incoming).length }} product{{ Object.keys(incoming).length === 1 ? "" : "s" }}. You already have a list in this browser.
       </p>
-    </Card>
+      <div class="flex flex-wrap gap-2">
+        <Button size="lg" class="rounded-none" @click="useShared('replace')">Use the shared list</Button>
+        <Button size="lg" variant="outline" class="rounded-none border-2 border-border" @click="useShared('merge')">Add it to mine</Button>
+        <Button size="lg" variant="ghost" class="rounded-none hover:bg-hivis-ink/10" @click="sharedList = null">Keep mine</Button>
+      </div>
+    </div>
+
+    <!-- phone: the answer first, before the list editor -->
+    <a v-if="plan" href="#plan" class="label-stock grid grid-cols-[1fr_auto] items-end gap-x-3 px-4 py-3 lg:hidden" @click.prevent="($refs.planEl as HTMLElement)?.scrollIntoView({ behavior: 'smooth' })">
+      <span>
+        <span class="block label-caps text-muted-foreground">Cheapest total</span>
+        <span class="font-heading text-[2rem] leading-none font-bold">{{ money(plan.total) }}</span>
+      </span>
+      <span class="flex flex-col items-end gap-1 text-right">
+        <span v-if="saving" class="bg-good px-1.5 py-0.5 font-heading text-sm font-bold tracking-wide whitespace-nowrap text-background uppercase">Saves {{ money(saving.amount) }}</span>
+        <span class="text-sm whitespace-nowrap">{{ purchases }} purchase{{ purchases === 1 ? "" : "s" }} · <span class="font-semibold underline">See plan</span></span>
+      </span>
+    </a>
+
+    <div class="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
+      <!-- the list -->
+      <section class="label-stock" aria-labelledby="list-h">
+        <div class="flex items-center justify-between gap-2 border-b-2 border-border px-4 py-2.5">
+          <h2 id="list-h" class="font-heading text-xl font-bold uppercase">Your list</h2>
+          <Button v-if="rows.length" variant="ghost" size="lg" class="rounded-none" @click="copyLink">
+            <Check v-if="copied" /><Link2 v-else />
+            {{ copied ? "Link copied" : "Copy link" }}
+          </Button>
+        </div>
+
+        <div class="border-b-2 border-border p-4">
+          <SearchAutocomplete
+            v-model="q"
+            :groups="groups"
+            placeholder="Add a product"
+            label="Add a product"
+            empty-text="No products match."
+            @select="add($event.id)"
+            @submit="addFirst"
+          />
+        </div>
+
+        <ul v-if="rows.length">
+          <li v-for="r in rows" :key="r.sku" class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 border-b border-rule px-4 py-3 last:border-b-0 max-sm:grid-cols-[auto_minmax(0,1fr)]">
+            <a :href="r.p.u" target="_blank" rel="noopener" class="shrink-0" tabindex="-1">
+              <img v-if="r.p.i" :src="thumb(r.p.i)" alt="" class="size-12 border border-rule bg-white object-contain" />
+              <span v-else class="flex size-12 items-center justify-center bg-muted"><ImageOff class="size-5 text-muted-foreground" /></span>
+            </a>
+            <div class="min-w-0 flex-1">
+              <a :href="r.p.u" target="_blank" rel="noopener" class="line-clamp-2 text-sm leading-snug font-semibold hover:underline">{{ shortName(r.p.n) }}</a>
+              <p class="text-xs text-muted-foreground">
+                <template v-if="r.p.sst">{{ money(r.p.sp) }} on its own<template v-if="r.p.via"> · cheaper in a bundle</template></template>
+                <template v-else>Out of stock on its own</template>
+              </p>
+            </div>
+            <div class="flex items-center justify-end gap-2 max-sm:col-start-2 max-sm:justify-between">
+            <div class="flex shrink-0 items-center border-2 border-border">
+              <button type="button" :class="qtyBtn" aria-label="One fewer" @click="list.setQty(r.sku, r.qty - 1)"><Minus /></button>
+              <span class="w-7 text-center text-sm font-semibold" aria-live="polite">{{ r.qty }}</span>
+              <button type="button" :class="qtyBtn" aria-label="One more" :disabled="r.qty >= MAX_QTY" @click="list.setQty(r.sku, r.qty + 1)"><Plus /></button>
+            </div>
+            <button type="button" :class="[qtyBtn, 'text-muted-foreground hover:text-foreground']" :aria-label="`Remove ${shortName(r.p.n)}`" @click="list.remove(r.sku)">
+              <X />
+            </button>
+            </div>
+          </li>
+        </ul>
+        <div v-else-if="cleared" role="status" class="flex flex-wrap items-center justify-center gap-3 px-6 py-10 text-sm">
+          <span>List cleared.</span>
+          <Button variant="outline" size="lg" class="rounded-none border-2 border-border" @click="undoClear"><Undo2 /> Undo</Button>
+        </div>
+        <div v-else class="flex flex-col items-center gap-2 px-6 py-12 text-center text-sm text-muted-foreground">
+          <ShoppingCart class="size-8" />
+          <p class="max-w-xs text-pretty">Add products above, or with the cart button on any product. The plan works out the cheapest mix of bundles and single items, and bundle extras count as free.</p>
+        </div>
+
+        <!-- clearing is kept apart from everything else, and can be undone -->
+        <div v-if="rows.length" class="flex justify-end border-t-2 border-border px-4 py-3">
+          <Button variant="outline" size="lg" class="rounded-none border-2 border-border" @click="clearList">
+            <Trash2 /> Clear list
+          </Button>
+        </div>
+      </section>
+
+      <!-- the plan -->
+      <section v-if="plan" id="plan" ref="planEl" class="label-stock scroll-mt-4 lg:sticky lg:top-4" aria-labelledby="plan-h">
+        <div class="border-b-2 border-border">
+          <h2 id="plan-h" class="px-4 pt-2.5 font-heading text-xl font-bold uppercase">Cheapest way to buy it</h2>
+          <div class="mt-2 grid grid-cols-[auto_1fr] items-stretch border-t-2 border-border">
+            <span class="bg-primary px-4 py-1.5 font-heading text-[2.5rem] leading-tight font-bold text-primary-foreground">{{ money(plan.total) }}</span>
+            <span class="flex flex-col justify-center px-4 text-sm leading-snug">
+              <span class="font-semibold">{{ purchases }} purchase{{ purchases === 1 ? "" : "s" }}</span>
+              <span class="text-muted-foreground">Prices as of {{ asOf }}</span>
+            </span>
+          </div>
+          <p v-if="saving" class="bg-good px-4 py-1.5 font-heading text-base font-bold tracking-wide text-background uppercase">
+            Saves {{ money(saving.amount) }} ({{ pct(saving.pct) }}) on buying each on its own ({{ money(plan.separate!) }})
+          </p>
+          <p v-else-if="plan.separate != null && plan.buys.length" class="px-4 py-2 text-sm text-muted-foreground">
+            Buying each on its own is already the cheapest way.
+          </p>
+          <p v-if="!plan.exact" class="border-t border-rule px-4 py-2 text-xs text-muted-foreground">
+            This list is large, so this is a very good plan rather than a guaranteed best one.
+          </p>
+        </div>
+
+        <div v-if="plan.unavailable.length" class="flex gap-2 border-b-2 border-border bg-hivis p-4 text-sm text-hivis-ink">
+          <TriangleAlert class="mt-0.5 size-4 shrink-0" />
+          <p>
+            Not in stock anywhere right now, so not included:
+            <strong class="font-semibold">{{ plan.unavailable.map(name).join(", ") }}</strong>
+          </p>
+        </div>
+
+        <ul>
+          <li v-for="b in plan.buys" :key="b.listing.s" class="flex gap-3 border-b border-rule p-4 last:border-b-0">
+            <a :href="b.listing.u" target="_blank" rel="noopener" class="shrink-0" tabindex="-1">
+              <img v-if="b.listing.i" :src="thumb(b.listing.i)" alt="" class="size-14 border border-rule bg-white object-contain" />
+              <span v-else class="flex size-14 items-center justify-center bg-muted"><ImageOff class="size-5 text-muted-foreground" /></span>
+            </a>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-start justify-between gap-3">
+                <a :href="b.listing.u" target="_blank" rel="noopener" class="line-clamp-2 text-sm leading-snug font-semibold hover:underline">
+                  {{ shortName(b.listing.n) }}
+                </a>
+                <span class="text-right font-bold whitespace-nowrap">
+                  <template v-if="b.count > 1"><span class="font-normal text-muted-foreground">{{ b.count }} × {{ money(b.listing.p) }}</span><br /></template>
+                  {{ money(b.listing.p * b.count) }}
+                </span>
+              </div>
+              <span class="mt-1 inline-block border border-current px-1.5 label-caps text-muted-foreground">{{ b.listing.bundle ? "Bundle" : "On its own" }}</span>
+              <p v-if="b.listing.bundle" class="mt-1.5 text-[0.8125rem]">
+                <span class="text-muted-foreground">For:</span>
+                {{ b.covers.map(([s, n]) => name(s) + (n > 1 ? ` ×${n}` : "")).join(", ") }}
+              </p>
+              <p v-if="b.extras.length" class="mt-1 flex gap-1 text-[0.8125rem] font-semibold text-good">
+                <Gift class="mt-0.5 size-3.5 shrink-0" />
+                <span>Also comes with {{ b.extras.map(([s, n]) => name(s) + (n > 1 ? ` ×${n}` : "")).join(", ") }}</span>
+              </p>
+            </div>
+          </li>
+        </ul>
+
+        <p class="border-t-2 border-border px-4 py-3 text-xs text-muted-foreground">
+          Uses in-stock prices for single products and every bundle, collected once a day. Check prices on the store before buying.
+        </p>
+      </section>
+    </div>
   </div>
 </template>
