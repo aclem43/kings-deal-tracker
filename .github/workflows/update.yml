@@ -2,7 +2,7 @@ name: Update prices and deploy
 
 on:
   schedule:
-    - cron: "23 19 * * *"   # daily, ~5:23am AEST
+    - cron: "7 15 * * *"    # daily, ~1:07am AEST (GitHub often starts it hours late)
   workflow_dispatch:        # "Run workflow" button in the Actions tab
   push:
     branches: [main]
