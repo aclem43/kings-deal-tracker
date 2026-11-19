@@ -2,7 +2,9 @@
 import { computed } from "vue";
 import { DAY, money, today, type Item } from "@/lib/data";
 
-const props = defineProps<{ item: Item }>();
+// Takes an item, or any series with the same shape (the shopping list's total over time).
+type Series = Pick<Item, "h" | "lo" | "hi" | "p">;
+const props = defineProps<{ item: Series; label?: string }>();
 
 const W = 200, H = 36, PAD = 4;
 // Under a week of history every change crowds into the right-hand edge, so the chart waits;
@@ -28,7 +30,7 @@ const chart = computed(() => {
   return {
     d,
     cy: y(props.item.p),
-    label: "Price history: " + h.map(([dd, v]) => `${dd} ${money(v)}`).join(", "),
+    label: (props.label ?? "Price history") + ": " + h.map(([dd, v]) => `${dd} ${money(v)}`).join(", "),
   };
 });
 </script>

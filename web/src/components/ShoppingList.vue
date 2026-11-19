@@ -2,10 +2,13 @@
 import { computed, onBeforeUnmount, ref } from "vue";
 import { Check, Gift, ImageOff, Link2, Minus, Plus, ShoppingCart, Trash2, TriangleAlert, Undo2, X } from "@lucide/vue";
 import { Button } from "@/components/ui/button";
-import { money, pct, shortName, thumbUrl, type Bundle, type Product } from "@/lib/data";
+import { historyBadges, money, pct, shortDate, shortName, statsLine, thumbUrl, type Bundle, type Product } from "@/lib/data";
 import { rankMatches } from "@/lib/search";
 import SearchAutocomplete, { type SuggestionGroup } from "./SearchAutocomplete.vue";
 import { optimise } from "@/lib/optimise";
+import { listHistory } from "@/lib/listHistory";
+import Sparkline from "./Sparkline.vue";
+import ToneBadge from "./ToneBadge.vue";
 import { MAX_QTY, useShoppingList } from "@/composables/useShoppingList";
 import { itemsParam, useFilters } from "@/composables/useFilters";
 
@@ -23,10 +26,41 @@ const rows = computed(() =>
     .filter((r): r is { p: Product; sku: string; qty: number } => !!r.p),
 );
 
-const plan = computed(() => {
-  if (!rows.value.length) return null;
-  const needs = new Map(rows.value.map((r) => [r.sku, r.qty]));
-  return optimise(needs, props.bySku, props.bundles);
+const needs = computed(() => new Map(rows.value.map((r) => [r.sku, r.qty])));
+const plan = computed(() => (rows.value.length ? optimise(needs.value, props.bySku, props.bundles) : null));
+
+// Each row's own history: badges that say something (stock is already in the row) and the low/high line.
+const rowHistory = (p: Product) => ({
+  badges: historyBadges(p).filter((b) => b.tone !== "warn"),
+  stats: statsLine(p),
+});
+
+/* ---------- what this list would have cost on past days ---------- */
+
+const history = computed(() => {
+  const p = plan.value;
+  if (!p) return null;
+  const pts = listHistory(needs.value, props.bySku, props.bundles);
+  if (!pts.length) return null;
+  // Days when something couldn't be bought have a smaller total that isn't comparable, so
+  // the low, high and chart use only days when the whole list was in stock.
+  const full = pts.filter((x) => x.complete);
+  const lo = full.length ? full.reduce((a, b) => (b.total < a.total ? b : a)) : null;
+  const hi = full.length ? full.reduce((a, b) => (b.total > a.total ? b : a)) : null;
+  const todayComplete = !p.unavailable.length;
+  // Newest first, each with its change from the day before it (when both are comparable).
+  const changes = pts.map((x, i) => {
+    const prev = pts[i - 1];
+    return { ...x, delta: prev && prev.complete && x.complete ? x.total - prev.total : null };
+  }).reverse().slice(0, 5);
+  return {
+    since: pts[0].d,
+    moved: !!lo && !!hi && hi.total > lo.total,
+    lo, hi, todayComplete, changes,
+    more: pts.length > 5,
+    atLow: todayComplete && !!lo && !!hi && hi.total > lo.total && p.total <= lo.total,
+    series: { h: full.map((x) => [x.d, x.total] as [string, number]), lo: lo?.total ?? 0, hi: hi?.total ?? 0, p: p.total },
+  };
 });
 const purchases = computed(() => plan.value?.buys.reduce((n, b) => n + b.count, 0) ?? 0);
 // "5 purchases" over 4 rows reads as a mismatch, so say how many listings they come from.
@@ -200,6 +234,12 @@ const qtyBtn = "flex size-9 items-center justify-center hover:bg-muted disabled:
                 <template v-if="r.p.sst">{{ money(r.p.sp) }} on its own<template v-if="r.p.via"> · cheaper in a bundle</template></template>
                 <template v-else>Out of stock on its own</template>
               </p>
+              <template v-for="h in [rowHistory(r.p)]" :key="r.sku">
+                <div v-if="h.badges.length" class="mt-1 flex flex-wrap gap-1">
+                  <ToneBadge v-for="b in h.badges" :key="b.text" :badge="b" />
+                </div>
+                <p v-if="h.stats" class="mt-0.5 text-xs text-muted-foreground" title="The cheapest way to get it, alone or in a bundle">{{ h.stats }}</p>
+              </template>
             </div>
             <div class="flex items-center justify-end gap-2 max-sm:col-start-2 max-sm:justify-between">
             <div class="flex shrink-0 items-center border-2 border-border">
@@ -298,6 +338,38 @@ const qtyBtn = "flex size-9 items-center justify-center hover:bg-muted disabled:
             </div>
           </li>
         </ul>
+
+        <!-- the list's price history: this plan re-run on each past day's prices -->
+        <div v-if="history" class="border-t-2 border-border px-4 py-3" aria-labelledby="hist-h">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h3 id="hist-h" class="label-caps text-muted-foreground">This list over time</h3>
+            <ToneBadge v-if="history.atLow" :badge="{ text: 'Lowest yet', tone: 'good', hint: `The lowest this list has cost since ${shortDate(history.since)}` }" />
+          </div>
+          <p v-if="!history.todayComplete" class="mt-1.5 text-sm text-muted-foreground">
+            Something on the list is out of stock today, so today's total can't be compared with other days.
+          </p>
+          <p v-else-if="!history.moved" class="mt-1.5 text-sm">
+            {{ money(plan.total) }} every day since {{ shortDate(history.since) }}. Changes will show here.
+          </p>
+          <template v-else>
+            <Sparkline :item="history.series" label="This list's total over time" class="mt-2 mb-1" />
+            <p class="mt-1.5 text-sm">
+              Low <span class="font-semibold">{{ money(history.lo!.total) }}</span> on {{ shortDate(history.lo!.d) }}
+              · High <span class="font-semibold">{{ money(history.hi!.total) }}</span> on {{ shortDate(history.hi!.d) }}
+            </p>
+          </template>
+          <ol v-if="history.changes.length > 1" class="mt-2 text-sm">
+            <li v-for="c in history.changes" :key="c.d" class="flex items-baseline justify-between gap-3 border-t border-rule py-1.5">
+              <span class="text-muted-foreground">{{ c.d === history.since ? `${shortDate(c.d)}, first seen` : shortDate(c.d) }}</span>
+              <span class="text-right whitespace-nowrap">
+                <template v-if="!c.complete"><span class="text-xs text-muted-foreground">Not all in stock · </span></template>
+                <span v-if="c.delta" class="mr-2 text-xs font-semibold" :class="c.delta < 0 ? 'text-good' : 'text-bad'">{{ c.delta < 0 ? "−" : "+" }}{{ money(Math.abs(c.delta)) }}</span>
+                <span :class="c.complete ? 'font-semibold' : 'text-muted-foreground'">{{ money(c.total) }}</span>
+              </span>
+            </li>
+          </ol>
+          <p v-if="history.more" class="mt-1 text-xs text-muted-foreground">Latest five changes shown.</p>
+        </div>
 
         <div class="flex flex-wrap items-center justify-between gap-2 border-t-2 border-border px-4 py-3">
           <span class="text-sm">Send this plan to someone, or keep it for later.</span>

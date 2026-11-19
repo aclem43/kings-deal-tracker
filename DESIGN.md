@@ -364,6 +364,9 @@ A full-width yellow strip directly under the bar, condensed caps 0.875rem: "Unof
 ### Sparkline
 A 36px step line in ink at 1.5px over a 1px hairline baseline, no area fill, ending in a small square dot at today's price, ringed in label stock. Left out of the phone label, where the low/high line carries it. Drawn only once the price has actually moved and the history spans at least 7 days; until then the low/high line stands alone.
 
+### List History
+Under the plan's buys, "This list over time" in Label Caps: the plan re-run on each past day's prices, so it ends on today's total. The same Sparkline once it can draw, low and high with dates, then the latest five changes as hairline-ruled rows (date left; change in saving green or signal red, then the total). Days when something was out of stock are marked "Not all in stock" and left out of the low, high and line. A "Lowest yet" good badge when today is the low. Each list row also carries its history badges and low/high/usual line.
+
 ## Do's and Don'ts
 
 ### Do:

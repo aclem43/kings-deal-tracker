@@ -9,7 +9,8 @@ effective price, because that is what you would actually pay.
 Outputs:
   _site/index.html, assets/              (the built frontend, copied from web/dist/;
                                          run `npm run build` in web/ first)
-  _site/data.json                        (products + bundles)
+  _site/data.json                        (products + bundles, with each listing's own
+                                         price/stock change points for list history)
   _site/feed.xml                         (RSS of recent effective-price drops)
 """
 import csv
@@ -105,6 +106,17 @@ def price_stats(points, today):
     }
 
 
+def own_series(points):
+    """The listing's own (date, price, in stock 0/1) change points; delisted counts as out of stock.
+    The shopping list replays its plan on these to show what the list cost on each past day."""
+    out = []
+    for d, p, s in points:
+        pt = [d.isoformat(), p, 1 if s == "1" else 0]
+        if not out or out[-1][1:] != pt[1:]:
+            out.append(pt)
+    return out
+
+
 def cheapest(hist, sku, bundles_with, day):
     """Cheapest in-stock way to get `sku` on `day`: (price, bundle sku or None), or None if nothing in stock."""
     options = []
@@ -177,6 +189,7 @@ def build(meta, hist, today):
             "b": options[:TOP_BUNDLES],
         })
         rec.update(price_stats(series, today))
+        rec["o"] = own_series(hist.points[sku])
         products.append(rec)
 
     bundle_recs = []
@@ -198,6 +211,7 @@ def build(meta, hist, today):
             "x": [f"{short(meta[s]['name'])}{f' ×{q}' if q > 1 else ''}" for s, q in m["parts"] if s in meta],
         })
         rec.update(price_stats(hist.points[sku], today))
+        rec["o"] = own_series(hist.points[sku])
         bundle_recs.append(rec)
     return products, bundle_recs
 

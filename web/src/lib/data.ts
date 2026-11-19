@@ -19,6 +19,7 @@ interface BaseRaw {
   pv: number | null; // previous price
   pd: string | null; // date of last change
   h: [string, number][]; // history
+  o?: [string, number, number][]; // own price change points: date, price, in stock 0/1 (older data.json files don't have it)
 }
 
 export interface BundleOption {
@@ -77,6 +78,9 @@ export const pct = (v: number) => {
   return (r === 0 && v !== 0 ? "<1" : String(r)) + "%";
 };
 export const daysAgo = (iso: string) => Math.round((today.getTime() - new Date(iso).getTime()) / DAY);
+// "2026-11-19" -> "19 Nov", read as a calendar date, not shifted by the viewer's time zone.
+export const shortDate = (iso: string) =>
+  new Date(iso + "T00:00:00").toLocaleDateString("en-AU", { day: "numeric", month: "short" });
 export const shortName = (n: string) => n.split("|")[0].trim();
 
 // Bundle part names come as "Kings Lantern ×4"; split off the count.
