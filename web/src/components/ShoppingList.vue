@@ -360,7 +360,10 @@ const qtyBtn = "flex size-9 items-center justify-center hover:bg-muted disabled:
           </template>
           <ol v-if="history.changes.length > 1" class="mt-2 text-sm">
             <li v-for="c in history.changes" :key="c.d" class="flex items-baseline justify-between gap-3 border-t border-rule py-1.5">
-              <span class="text-muted-foreground">{{ c.d === history.since ? `${shortDate(c.d)}, first seen` : shortDate(c.d) }}</span>
+              <span class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <span class="text-muted-foreground">{{ c.d === history.since ? `${shortDate(c.d)}, first seen` : shortDate(c.d) }}</span>
+                <ToneBadge v-if="history.moved && c.complete && c.total === history.lo!.total" :badge="{ text: 'Cheapest', tone: 'good', hint: `The lowest this list has cost since ${shortDate(history.since)}` }" />
+              </span>
               <span class="text-right whitespace-nowrap">
                 <template v-if="!c.complete"><span class="text-xs text-muted-foreground">Not all in stock · </span></template>
                 <span v-if="c.delta" class="mr-2 text-xs font-semibold" :class="c.delta < 0 ? 'text-good' : 'text-bad'">{{ c.delta < 0 ? "−" : "+" }}{{ money(Math.abs(c.delta)) }}</span>
