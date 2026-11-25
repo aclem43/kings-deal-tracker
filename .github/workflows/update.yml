@@ -42,6 +42,7 @@ jobs:
             echo "No changes"
           else
             git commit -m "Price data $(TZ=Australia/Brisbane date +%F)"
+            git pull --rebase
             git push
           fi
 
@@ -62,8 +63,24 @@ jobs:
       - uses: actions/upload-pages-artifact@v5
         with:
           path: _site
-      - id: deploy
-        uses: actions/deploy-pages@v5
+
+  # Separate job so the uploaded artifact has time to become visible, and so
+  # "Re-run failed jobs" retries only the deploy, not the scrape.
+  deploy:
+    needs: update
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment:
       name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+      url: ${{ steps.deploy.outputs.page_url || steps.deploy_retry.outputs.page_url }}
+    steps:
+      # deploy-pages sometimes can't see the artifact yet ("No artifacts named
+      # github-pages were found"); wait and try once more.
+      - id: deploy
+        uses: actions/deploy-pages@v5
+        continue-on-error: true
+      - if: steps.deploy.outcome == 'failure'
+        run: sleep 30
+      - id: deploy_retry
+        if: steps.deploy.outcome == 'failure'
+        uses: actions/deploy-pages@v5
