@@ -1,5 +1,5 @@
 import type { Bundle, Product } from "./data";
-import { optimise } from "./optimise";
+import { optimise, type Buy } from "./optimise";
 
 // What a shopping list would have cost on each past day: the plan re-run on the prices
 // and stock every listing had that day. Today's point is the same plan the page shows,
@@ -9,7 +9,12 @@ export interface ListPoint {
   d: string;         // ISO date the total started
   total: number;
   complete: boolean; // every item could be bought that day
+  buys: Buy[];       // how that total was made up (on its own, or which bundles)
+  separate: number | null; // every item bought on its own that day, if all were in stock alone
 }
+
+// Two plans are the same purchase when they buy the same listings the same number of times.
+const planKey = (buys: Buy[]) => buys.map((b) => `${b.listing.s}x${b.count}`).sort().join(",");
 
 // The change point in effect on `day` (dates sort as strings), or null before the listing existed.
 function at(o: [string, number, number][], day: string) {
@@ -41,9 +46,11 @@ export function listHistory(needs: Map<string, number>, bySku: Map<string, Produ
       return { ...b, p: pt?.[1] ?? 0, st: pt?.[2] ?? 0 };
     });
     const plan = optimise(needs, prods, bs);
-    const point = { d: day, total: plan.total, complete: !plan.unavailable.length };
+    const point = { d: day, total: plan.total, complete: !plan.unavailable.length, buys: plan.buys, separate: plan.separate };
     const last = out[out.length - 1];
-    if (!last || last.total !== point.total || last.complete !== point.complete) out.push(point);
+    // A new row when the total moves, or when the same total now comes a different way.
+    if (!last || last.total !== point.total || last.complete !== point.complete
+      || planKey(last.buys) !== planKey(point.buys) || last.separate !== point.separate) out.push(point);
   }
   return out;
 }

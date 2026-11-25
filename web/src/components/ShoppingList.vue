@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { historyBadges, money, pct, shortDate, shortName, statsLine, thumbUrl, type Bundle, type Product } from "@/lib/data";
 import { rankMatches } from "@/lib/search";
 import SearchAutocomplete, { type SuggestionGroup } from "./SearchAutocomplete.vue";
-import { optimise } from "@/lib/optimise";
+import { optimise, type Buy } from "@/lib/optimise";
 import { listHistory } from "@/lib/listHistory";
 import Sparkline from "./Sparkline.vue";
 import ToneBadge from "./ToneBadge.vue";
@@ -48,6 +48,10 @@ const history = computed(() => {
   const lo = full.length ? full.reduce((a, b) => (b.total < a.total ? b : a)) : null;
   const hi = full.length ? full.reduce((a, b) => (b.total > a.total ? b : a)) : null;
   const todayComplete = !p.unavailable.length;
+  // The same list bought only as single items, so the bundle saving over time is visible.
+  const alone = pts.filter((x) => x.separate != null);
+  const aloneLo = alone.length ? alone.reduce((a, b) => (b.separate! < a.separate! ? b : a)) : null;
+  const aloneHi = alone.length ? alone.reduce((a, b) => (b.separate! > a.separate! ? b : a)) : null;
   // Newest first, each with its change from the day before it (when both are comparable).
   const changes = pts.map((x, i) => {
     const prev = pts[i - 1];
@@ -56,12 +60,28 @@ const history = computed(() => {
   return {
     since: pts[0].d,
     moved: !!lo && !!hi && hi.total > lo.total,
-    lo, hi, todayComplete, changes,
+    lo, hi, todayComplete, changes, aloneLo, aloneHi,
     more: pts.length > 5,
     atLow: todayComplete && !!lo && !!hi && hi.total > lo.total && p.total <= lo.total,
     series: { h: full.map((x) => [x.d, x.total] as [string, number]), lo: lo?.total ?? 0, hi: hi?.total ?? 0, p: p.total },
   };
 });
+// How a past day's total was made up, in a few words: alone, or which bundle(s).
+function howText(buys: Buy[]): string {
+  const bundles = buys.filter((b) => b.listing.bundle);
+  if (!bundles.length) return needs.value.size === 1 && buys[0]?.count === 1 ? "On its own" : "Each on its own";
+  // One item on the list: name what the bundle adds, which is what tells bundles apart.
+  if (needs.value.size === 1 && buys.length === 1) {
+    const b = buys[0];
+    const extras = b.extras.map(([s, n]) => name(s) + (n > 1 ? ` ×${n}` : "")).join(", ");
+    return (b.count > 1 ? `${b.count} × bundle` : "Bundle") + (extras ? ` with ${extras}` : "");
+  }
+  const parts = bundles.map((b) => (b.count > 1 ? `${b.count} × ` : "") + shortName(b.listing.n));
+  const own = buys.length - bundles.length;
+  return `Bundle${bundles.length > 1 ? "s" : ""}: ${parts.join("; ")}` + (own ? ` · ${own} on ${own === 1 ? "its" : "their"} own` : "");
+}
+const isBundled = (buys: Buy[]) => buys.some((b) => b.listing.bundle);
+
 const purchases = computed(() => plan.value?.buys.reduce((n, b) => n + b.count, 0) ?? 0);
 // "5 purchases" over 4 rows reads as a mismatch, so say how many listings they come from.
 const purchaseText = computed(() => {
@@ -355,14 +375,29 @@ const qtyBtn = "flex size-9 items-center justify-center hover:bg-muted disabled:
             <Sparkline :item="history.series" label="This list's total over time" class="mt-2 mb-1" />
             <p class="mt-1.5 text-sm">
               Low <span class="font-semibold">{{ money(history.lo!.total) }}</span> on {{ shortDate(history.lo!.d) }}
+              <span class="text-muted-foreground">({{ isBundled(history.lo!.buys) ? "in a bundle" : "on its own" }})</span>
               · High <span class="font-semibold">{{ money(history.hi!.total) }}</span> on {{ shortDate(history.hi!.d) }}
+              <span class="text-muted-foreground">({{ isBundled(history.hi!.buys) ? "in a bundle" : "on its own" }})</span>
             </p>
           </template>
+          <p v-if="history.aloneLo" class="mt-1 text-sm text-muted-foreground" title="What the list cost with no bundles, buying each item on its own">
+            {{ needs.size === 1 ? "On its own" : "Each on its own" }}:
+            <template v-if="history.aloneHi!.separate! > history.aloneLo.separate!">
+              low <span class="font-semibold text-foreground">{{ money(history.aloneLo.separate!) }}</span> on {{ shortDate(history.aloneLo.d) }}
+              · high <span class="font-semibold text-foreground">{{ money(history.aloneHi!.separate!) }}</span> on {{ shortDate(history.aloneHi!.d) }}
+            </template>
+            <template v-else><span class="font-semibold text-foreground">{{ money(history.aloneLo.separate!) }}</span> every day</template>
+          </p>
           <ol v-if="history.changes.length > 1" class="mt-2 text-sm">
             <li v-for="c in history.changes" :key="c.d" class="flex items-baseline justify-between gap-3 border-t border-rule py-1.5">
-              <span class="flex flex-wrap items-center gap-x-2 gap-y-1">
-                <span class="text-muted-foreground">{{ c.d === history.since ? `${shortDate(c.d)}, first seen` : shortDate(c.d) }}</span>
-                <ToneBadge v-if="history.moved && c.complete && c.total === history.lo!.total" :badge="{ text: 'Cheapest', tone: 'good', hint: `The lowest this list has cost since ${shortDate(history.since)}` }" />
+              <span class="flex min-w-0 flex-col gap-0.5">
+                <span class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <span class="text-muted-foreground">{{ c.d === history.since ? `${shortDate(c.d)}, first seen` : shortDate(c.d) }}</span>
+                  <ToneBadge v-if="history.moved && c.complete && c.total === history.lo!.total" :badge="{ text: 'Cheapest', tone: 'good', hint: `The lowest this list has cost since ${shortDate(history.since)}` }" />
+                </span>
+                <span class="text-xs text-muted-foreground">
+                  <Gift v-if="isBundled(c.buys)" class="mr-1 inline size-3 align-[-1px] text-good" />{{ howText(c.buys) }}<template v-if="isBundled(c.buys) && c.separate != null && c.separate - c.total >= 0.005"> · {{ money(c.separate) }} on {{ needs.size === 1 ? "its" : "their" }} own</template>
+                </span>
               </span>
               <span class="text-right whitespace-nowrap">
                 <template v-if="!c.complete"><span class="text-xs text-muted-foreground">Not all in stock · </span></template>
